@@ -1,0 +1,752 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.3">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 6.0px 0.0px; font: 12.0px Arial; color: #000000; -webkit-text-stroke: #2a2823}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.2px Arial; color: #000000; -webkit-text-stroke: #000000; background-color: #747065; background-color: rgba(116, 112, 101, 0.15)}
+    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.2px Arial; color: #000000; -webkit-text-stroke: #000000; background-color: #747065; background-color: rgba(116, 112, 101, 0.15); min-height: 11.0px}
+    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.2px Arial; color: #000000; -webkit-text-stroke: #000000}
+    span.s1 {font-kerning: none}
+    span.s2 {font-kerning: none; text-shadow: 0.0px 1.0px 0.0px #ffffff}
+    span.s3 {font-kerning: none; background-color: rgba(116, 112, 101, 0.15); text-shadow: 0.0px 1.0px 0.0px #ffffff}
+    span.s4 {font: 12.0px Arial; font-kerning: none; -webkit-text-stroke: 0px #ffffff}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;<br>
+&lt;html lang="en"&gt;<br>
+&lt;head&gt;<br>
+&lt;meta charset="UTF-8" /&gt;<br>
+&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" /&gt;<br>
+&lt;title&gt;Find Chaaya&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!--<br>
+Leaflet.js is the open-source map library we're using.<br>
+It handles all the map rendering, zoom, pan, and markers.<br>
+We load the CSS (styles) and JS (logic) from a CDN so<br>
+we don't have to bundle them ourselves.<br>
+--&gt;<br>
+&lt;link rel="stylesheet" href="<a href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">https://unpkg.com/leaflet@1.9.4/dist/leaflet.css</a>" /&gt;<br>
+&lt;script src="<a href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">https://unpkg.com/leaflet@1.9.4/dist/leaflet.js</a>"&gt;&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;style&gt;<br>
+/* ── Reset &amp; base ───────────────────────────────────────<br>
+Remove all default browser padding/margin and set<br>
+the page to fill the full screen. The map will take<br>
+up most of the viewport height. <span class="Apple-converted-space">                      </span>*/<br>
+* { margin: 0; padding: 0; box-sizing: border-box; }</span></p>
+<p class="p2"><span class="s2">body {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-family: 'Georgia', serif;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>background: #fdf8f2;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #2a1a0a;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>height: 100dvh; <span class="Apple-converted-space">          </span>/* dvh = dynamic viewport height, works on mobile */</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>display: flex;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>flex-direction: column; <span class="Apple-converted-space">  </span>/* stack header → map → panel vertically */</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>overflow: hidden;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* ── Header ─────────────────────────────────────────────</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">   </span>The top bar with the app name and tagline.<span class="Apple-converted-space">            </span>*/</span></p>
+<p class="p2"><span class="s2">header {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>padding: 12px 20px 10px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>background: #fdf8f2;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border-bottom: 1px solid #e8d8c4;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>flex-shrink: 0; <span class="Apple-converted-space">          </span>/* don't let the header compress */</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">header h1 {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 22px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-weight: 700;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>letter-spacing: -0.3px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #2a1a0a;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">header p {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 12px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #8B6340;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin-top: 1px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-style: italic;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* ── Filter bar ─────────────────────────────────────────</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">   </span>The row of controls for filtering by taste/vibe rating.</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">   </span>flex-shrink:0 ensures it never collapses. <span class="Apple-converted-space">            </span>*/</span></p>
+<p class="p2"><span class="s2">#filter-bar {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>display: flex;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>gap: 16px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>padding: 8px 16px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>background: #fdf8f2;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border-bottom: 1px solid #e8d8c4;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>flex-shrink: 0;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>flex-wrap: wrap;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">.filter-group {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>display: flex;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>gap: 8px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 12px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #5a3e28;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">.filter-group label {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>white-space: nowrap;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-weight: 600;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* The range slider — styled to match the warm colour palette */</span></p>
+<p class="p2"><span class="s2">.filter-group input[type=range] {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>width: 80px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>accent-color: #C8874A;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>cursor: pointer;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">.filter-group span {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>min-width: 28px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 13px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-weight: 700;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #C8874A;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">#shop-count {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin-left: auto;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 11px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #a0856a;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>white-space: nowrap;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* ── Map ────────────────────────────────────────────────</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">   </span>flex:1 means the map takes all remaining vertical space</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">   </span>after the header and filter bar are placed. <span class="Apple-converted-space">          </span>*/</span></p>
+<p class="p2"><span class="s2">#map {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>flex: 1;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>width: 100%;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>min-height: 0;<span class="Apple-converted-space">            </span>/* required for flex children to shrink */</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* ── Bottom info panel ──────────────────────────────────</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">   </span>Slides up from the bottom when a shop marker is tapped.</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">   </span>Uses transform to animate in/out smoothly.<span class="Apple-converted-space">            </span>*/</span></p>
+<p class="p2"><span class="s2">#info-panel {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>position: fixed;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>bottom: 0;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>left: 0;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>right: 0;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>background: #fdf8f2;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border-top: 1px solid #e8d8c4;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border-radius: 16px 16px 0 0;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>padding: 16px 20px 28px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>z-index: 1000;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>transform: translateY(100%); <span class="Apple-converted-space">  </span>/* hidden below screen by default */</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>transition: transform 0.28s ease;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>max-width: 600px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin: 0 auto;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* When the panel has class "open", slide it up into view */</span></p>
+<p class="p2"><span class="s2">#info-panel.open {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>transform: translateY(0);</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* The small drag handle at the top of the panel */</span></p>
+<p class="p2"><span class="s2">.panel-handle {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>width: 36px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>height: 4px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>background: #d4c4b0;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border-radius: 2px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin: 0 auto 14px;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">#panel-name {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 18px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-weight: 700;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #2a1a0a;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">#panel-location {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 13px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #8B6340;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin-top: 2px;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* The row showing taste and vibe rating badges */</span></p>
+<p class="p2"><span class="s2">#panel-ratings {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>display: flex;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>gap: 10px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin-top: 12px;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">.rating-badge {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>display: flex;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>flex-direction: column;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>background: #f5ede0;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border-radius: 10px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>padding: 8px 16px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>min-width: 80px;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">.rating-badge .badge-label {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 10px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #8B6340;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>text-transform: uppercase;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>letter-spacing: 0.5px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-weight: 600;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* Stars rendered as filled/empty unicode stars */</span></p>
+<p class="p2"><span class="s2">.rating-badge .stars {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 16px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #C8874A;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin-top: 3px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>letter-spacing: 1px;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">.rating-badge .rating-num {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 11px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #a0856a;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin-top: 1px;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* The action buttons at the bottom of the panel */</span></p>
+<p class="p2"><span class="s2">#panel-actions {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>display: flex;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>gap: 10px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin-top: 14px;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">.btn {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>flex: 1;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>padding: 11px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border-radius: 10px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 13px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-weight: 600;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border: none;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>cursor: pointer;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>text-align: center;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>text-decoration: none;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>display: inline-block;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">.btn-primary {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>background: #C8874A;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: white;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">.btn-secondary {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>background: #f5ede0;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #5a3e28;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* ── Loading overlay ────────────────────────────────────</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">   </span>Shown while the app fetches shop data from the script.</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">   </span>Fades out once data loads.<span class="Apple-converted-space">                            </span>*/</span></p>
+<p class="p2"><span class="s2">#loading {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>position: fixed;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>inset: 0;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>background: #fdf8f2;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>display: flex;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>flex-direction: column;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>justify-content: center;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>z-index: 9999;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>transition: opacity 0.4s ease;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">#loading h2 {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 24px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #2a1a0a;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin-bottom: 6px;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">#loading p {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 13px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #8B6340;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-style: italic;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">#loading-spinner {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>width: 36px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>height: 36px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border: 3px solid #e8d8c4;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border-top-color: #C8874A;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border-radius: 50%;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>animation: spin 0.8s linear infinite;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin-bottom: 16px;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">@keyframes spin { to { transform: rotate(360deg); } }</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* ── "Find me" button ───────────────────────────────────</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">   </span>Floating button that triggers GPS location.<span class="Apple-converted-space">          </span>*/</span></p>
+<p class="p2"><span class="s2">#locate-btn {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>position: fixed;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>bottom: 24px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>right: 16px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>z-index: 999;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>background: white;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border: 1px solid #e8d8c4;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border-radius: 50%;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>width: 46px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>height: 46px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>display: flex;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>justify-content: center;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>cursor: pointer;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 20px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>box-shadow: 0 2px 8px rgba(0,0,0,0.12);</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* ── Route info bar ─────────────────────────────────────</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">   </span>Shown inside the panel after a route is calculated.<span class="Apple-converted-space">  </span>*/</span></p>
+<p class="p2"><span class="s2">#route-row {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>display: none;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>gap: 10px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin-top: 10px;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">#route-row.visible { display: flex; }</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">.route-box {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>flex: 1;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>background: #f0e8d8;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>border-radius: 10px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>padding: 8px 12px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>text-align: center;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">.route-box .route-label {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 10px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #8B6340;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>text-transform: uppercase;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>letter-spacing: 0.5px;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">.route-box .route-val {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 16px;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-weight: 700;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>color: #2a1a0a;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>margin-top: 2px;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">/* Leaflet attribution — keep it but make it small */</span></p>
+<p class="p2"><span class="s2">.leaflet-control-attribution {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>font-size: 9px !important;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p1"><span class="s1">&lt;/style&gt;<br>
+&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- Loading screen shown until data is fetched --&gt;<br>
+&lt;div id="loading"&gt;<br>
+&lt;div id="loading-spinner"&gt;&lt;/div&gt;<br>
+&lt;h2&gt;Find Chaaya&lt;/h2&gt;<br>
+&lt;p&gt;by Le Chaaya&lt;/p&gt;<br>
+&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- Header --&gt;<br>
+&lt;header&gt;<br>
+&lt;h1&gt;Find Chaaya&lt;/h1&gt;<br>
+&lt;p&gt;by Le Chaaya&lt;/p&gt;<br>
+&lt;/header&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- Filter controls --&gt;<br>
+&lt;div id="filter-bar"&gt;<br>
+&lt;div class="filter-group"&gt;<br>
+&lt;label&gt;Taste ≥&lt;/label&gt;<br>
+&lt;input type="range" id="taste-filter" min="1" max="5" step="1" value="1" /&gt;<br>
+&lt;span id="taste-val"&gt;1&lt;/span&gt;<br>
+&lt;/div&gt;<br>
+&lt;div class="filter-group"&gt;<br>
+&lt;label&gt;Vibe ≥&lt;/label&gt;<br>
+&lt;input type="range" id="vibe-filter" min="1" max="5" step="1" value="1" /&gt;<br>
+&lt;span id="vibe-val"&gt;1&lt;/span&gt;<br>
+&lt;/div&gt;<br>
+&lt;span id="shop-count"&gt;&lt;/span&gt;<br>
+&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- The map renders into this div --&gt;<br>
+&lt;div id="map"&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- Floating locate button --&gt;<br>
+&lt;div id="locate-btn" onclick="locateMe()" title="Find my location"&gt;⊙&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;!-- Bottom sheet panel for shop details --&gt;<br>
+&lt;div id="info-panel"&gt;<br>
+&lt;div class="panel-handle"&gt;&lt;/div&gt;<br>
+&lt;div id="panel-name"&gt;Shop Name&lt;/div&gt;<br>
+&lt;div id="panel-location"&gt;Area, City&lt;/div&gt;<br>
+&lt;div id="panel-ratings"&gt;<br>
+&lt;div class="rating-badge"&gt;<br>
+&lt;span class="badge-label"&gt;Taste&lt;/span&gt;<br>
+&lt;span class="stars" id="taste-stars"&gt;&lt;/span&gt;<br>
+&lt;span class="rating-num" id="taste-num"&gt;&lt;/span&gt;<br>
+&lt;/div&gt;<br>
+&lt;div class="rating-badge"&gt;<br>
+&lt;span class="badge-label"&gt;Vibe&lt;/span&gt;<br>
+&lt;span class="stars" id="vibe-stars"&gt;&lt;/span&gt;<br>
+&lt;span class="rating-num" id="vibe-num"&gt;&lt;/span&gt;<br>
+&lt;/div&gt;<br>
+&lt;/div&gt;<br>
+&lt;div id="route-row"&gt;<br>
+&lt;div class="route-box"&gt;<br>
+&lt;div class="route-label"&gt;Distance&lt;/div&gt;<br>
+&lt;div class="route-val" id="route-dist"&gt;—&lt;/div&gt;<br>
+&lt;/div&gt;<br>
+&lt;div class="route-box"&gt;<br>
+&lt;div class="route-label"&gt;Walking&lt;/div&gt;<br>
+&lt;div class="route-val" id="route-time"&gt;—&lt;/div&gt;<br>
+&lt;/div&gt;<br>
+&lt;/div&gt;<br>
+&lt;div id="panel-actions"&gt;<br>
+&lt;a id="gmaps-btn" href="#" target="_blank" class="btn btn-primary"&gt;Open in Maps&lt;/a&gt;<br>
+&lt;button class="btn btn-secondary" onclick="getRoute()"&gt;Get route&lt;/button&gt;<br>
+&lt;button class="btn btn-secondary" onclick="closePanel()"&gt;Close&lt;/button&gt;<br>
+&lt;/div&gt;<br>
+&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;script&gt;<br>
+// ============================================================<br>
+// CONFIGURATION<br>
+// Paste the Apps Script Web App URL below:<br>
+// ============================================================<br>
+const SCRIPT_URL = '<a href="https://script.google.com/macros/s/AKfycbwo1VyT3C4QKiW1absjR5BdjTh7I4lW2q_tMii3IlSSh42cPotMNBl6z4DaBAu0gEIR/exec">https://script.google.com/macros/s/AKfycbwo1VyT3C4QKiW1absjR5BdjTh7I4lW2q_tMii3IlSSh42cPotMNBl6z4DaBAu0gEIR/exec</a>';</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">// HOW THE MARKER IMAGE WORKS</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// Use the chai glass PNG as the map marker.</span></p>
+<p class="p2"><span class="s2">// Leaflet's L.icon() defines a custom image as a</span></p>
+<p class="p2"><span class="s2">// marker. iconSize sets the display size on the map.</span></p>
+<p class="p2"><span class="s2">// iconAnchor is the pixel point on the icon that corresponds</span></p>
+<p class="p2"><span class="s2">// to the exact map location — [width/2, height] means the</span></p>
+<p class="p2"><span class="s2">// tip at the bottom-centre of the image is the anchor point.</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">const chaiIcon = L.icon({</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>iconUrl: 'marker.png',</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>iconSize: [40, 48],</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>iconAnchor: [20, 48],</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>popupAnchor: [0, -48]</span></p>
+<p class="p2"><span class="s2">});</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// Same icon but slightly larger for the selected state</span></p>
+<p class="p2"><span class="s2">const chaiIconSelected = L.icon({</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>iconUrl: 'marker.png',</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>iconSize: [50, 60],</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>iconAnchor: [25, 60],</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>popupAnchor: [0, -60]</span></p>
+<p class="p2"><span class="s2">});</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">// MAP INITIALISATION</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// L.map('map') creates a Leaflet map inside the &lt;div id="map"&gt;</span></p>
+<p class="p2"><span class="s2">// setView([lat, lng], zoom) sets the starting position.</span></p>
+<p class="p2"><span class="s2">// Zoom 12 = city level, 6 = country level.</span></p>
+<p class="p2"><span class="s2">// Start centred on Kochi since all current shops are there.</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// L.tileLayer() loads the map background tiles from</span></p>
+<p class="p2"><span class="s2">// OpenStreetMap — the actual street map imagery.</span></p>
+<p class="p2"><span class="s2">// {s} = subdomain, {z}/{x}/{y} = tile coordinates.</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">const map = L.map('map', { zoomControl: true }).setView([9.98, 76.3], 12);</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>maxZoom: 19,</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>attribution: '© OpenStreetMap contributors'</span></p>
+<p class="p2"><span class="s2">}).addTo(map);</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">// STATE VARIABLES</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// These variables live in memory and track the current state</span></p>
+<p class="p2"><span class="s2">// of the app — which shops are loaded, what's selected, etc.</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">let allShops = []; <span class="Apple-converted-space">          </span>// all shops fetched from the sheet</span></p>
+<p class="p2"><span class="s2">let markers = [];<span class="Apple-converted-space">            </span>// Leaflet marker objects on the map</span></p>
+<p class="p2"><span class="s2">let selectedMarker = null; <span class="Apple-converted-space">  </span>// currently selected marker</span></p>
+<p class="p2"><span class="s2">let userMarker = null; <span class="Apple-converted-space">      </span>// the blue dot showing your location</span></p>
+<p class="p2"><span class="s2">let routeLine = null;<span class="Apple-converted-space">        </span>// the dashed route line on the map</span></p>
+<p class="p2"><span class="s2">let activeShop = null; <span class="Apple-converted-space">      </span>// the shop currently shown in the panel</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">// FETCHING SHOP DATA</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// fetch() is the browser's built-in function to make HTTP</span></p>
+<p class="p2"><span class="s2">// requests. We call the Apps Script URL, which returns JSON.</span></p>
+<p class="p2"><span class="s2">// .then(r =&gt; r.json()) parses the JSON text into a JS object.</span></p>
+<p class="p2"><span class="s2">// Once we have the data, we call renderMarkers() to plot them.</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">fetch(SCRIPT_URL)</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>.then(r =&gt; r.json())</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>.then(data =&gt; {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>allShops = data.shops;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>renderMarkers(allShops);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>hideLoading();</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>})</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>.catch(err =&gt; {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>// If the fetch fails (wrong URL, network issue), show an</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>// error so the user knows something went wrong.</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>console.error('Failed to load shop data:', err);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>document.querySelector('#loading p').textContent = 'Could not load shops. Check the script URL.';</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>});</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">// RENDERING MARKERS</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// This function takes an array of shops and places a chai</span></p>
+<p class="p2"><span class="s2">// glass marker on the map for each one.</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// First we remove all existing markers (in case we're</span></p>
+<p class="p2"><span class="s2">// re-rendering after a filter change), then add fresh ones.</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// marker.on('click', ...) attaches a click handler so tapping</span></p>
+<p class="p2"><span class="s2">// a glass opens the info panel for that shop.</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">function renderMarkers(shops) {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>// Remove old markers from the map</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>markers.forEach(m =&gt; map.removeLayer(m));</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>markers = [];</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>shops.forEach(shop =&gt; {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>// Skip shops with missing coordinates</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>if (!shop.lat || !shop.lng) return;</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>const marker = L.marker([shop.lat, shop.lng], { icon: chaiIcon }).addTo(map);</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>marker.on('click', () =&gt; {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">      </span>selectShop(shop, marker);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>});</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>markers.push(marker);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>});</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>// Update the count label in the filter bar</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>document.getElementById('shop-count').textContent =</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>shops.length === 1 ? '1 shop' : shops.length + ' shops';</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">// SELECTING A SHOP</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// When you tap a marker, this function:</span></p>
+<p class="p2"><span class="s2">// 1. Resets the previously selected marker back to normal size</span></p>
+<p class="p2"><span class="s2">// 2. Makes the tapped marker larger (selected state)</span></p>
+<p class="p2"><span class="s2">// 3. Populates the info panel with that shop's details</span></p>
+<p class="p2"><span class="s2">// 4. Slides the panel up into view</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">function selectShop(shop, marker) {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>// Reset previous selection</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>if (selectedMarker) selectedMarker.setIcon(chaiIcon);</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>// Highlight new selection</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>marker.setIcon(chaiIconSelected);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>selectedMarker = marker;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>activeShop = shop;</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>// Fill in the panel</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>document.getElementById('panel-name').textContent = shop.name;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>document.getElementById('panel-location').textContent =</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>[shop.area, shop.city, shop.state].filter(Boolean).join(', ');</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p4"><span class="s3"><span class="Apple-converted-space">  </span>document.getElementById('taste-stars').</span><span class="s4">innerHTML</span><span class="s3"> = starsFor(shop.taste);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>document.getElementById('taste-num').textContent = shop.taste + ' / 5';</span></p>
+<p class="p4"><span class="s3"><span class="Apple-converted-space">  </span>document.getElementById('vibe-stars').</span><span class="s4">innerHTML</span><span class="s3"> = starsFor(shop.vibe);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>document.getElementById('vibe-num').textContent = shop.vibe + ' / 5';</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>// Set the Google Maps link</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>const gmapsBtn = document.getElementById('gmaps-btn');</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>if (shop.gmaps) {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>gmapsBtn.href = shop.gmaps;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>gmapsBtn.style.display = 'block';</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>} else {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>gmapsBtn.style.display = 'none';</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>// Hide any previous route info</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>document.getElementById('route-row').classList.remove('visible');</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>// Open the panel by adding the 'open' class (see CSS)</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>document.getElementById('info-panel').classList.add('open');</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>// Pan the map to centre on the selected shop</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>map.panTo([shop.lat, shop.lng]);</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">// STAR RATINGS</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// Converts a number (e.g. 4) into filled/empty star characters</span></p>
+<p class="p2"><span class="s2">// e.g. starsFor(4) → "★★★★☆"</span></p>
+<p class="p2"><span class="s2">// Math.round handles half-values like 3.5 → 4</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">function starsFor(n) {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>const val = Number(n);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>let html = '';</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>for (let i = 1; i &lt;= 5; i++) {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>if (val &gt;= i) {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">      </span>html += '&lt;span style="color:#C8874A"&gt;★&lt;/span&gt;';</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>} else if (val &gt;= i - 0.5) {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">      </span>html += '&lt;span style="background:linear-gradient(to right,#C8874A 50%,#ddd 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"&gt;★&lt;/span&gt;';</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>} else {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">      </span>html += '&lt;span style="color:#ddd"&gt;★&lt;/span&gt;';</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>return html;</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">// CLOSING THE PANEL</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">function closePanel() {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>document.getElementById('info-panel').classList.remove('open');</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>if (selectedMarker) selectedMarker.setIcon(chaiIcon);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>selectedMarker = null;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>activeShop = null;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>if (routeLine) { map.removeLayer(routeLine); routeLine = null; }</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// Close panel when tapping the map background</span></p>
+<p class="p2"><span class="s2">map.on('click', closePanel);</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">// FILTERING</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// When either slider moves, re-filter allShops to only</span></p>
+<p class="p2"><span class="s2">// those where taste &gt;= tasteMin AND vibe &gt;= vibeMin,</span></p>
+<p class="p2"><span class="s2">// then re-render the markers.</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// allShops never changes — it always holds the full list.</span></p>
+<p class="p2"><span class="s2">// This just passes a filtered subset to renderMarkers().</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">const tasteSlider = document.getElementById('taste-filter');</span></p>
+<p class="p2"><span class="s2">const vibeSlider = document.getElementById('vibe-filter');</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">tasteSlider.addEventListener('input', applyFilters);</span></p>
+<p class="p2"><span class="s2">vibeSlider.addEventListener('input', applyFilters);</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">function applyFilters() {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>const tasteMin = Number(tasteSlider.value);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>const vibeMin = Number(vibeSlider.value);</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>document.getElementById('taste-val').textContent = tasteMin;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>document.getElementById('vibe-val').textContent = vibeMin;</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>const filtered = allShops.filter(s =&gt;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>Number(s.taste) &gt;= tasteMin &amp;&amp; Number(s.vibe) &gt;= vibeMin</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>);</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>closePanel();</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>renderMarkers(filtered);</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">// GPS — FIND ME</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// navigator.geolocation is the browser API for GPS.</span></p>
+<p class="p2"><span class="s2">// getCurrentPosition() asks the user for permission and</span></p>
+<p class="p2"><span class="s2">// then returns their coordinates.</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// We place a blue circle marker at their location.</span></p>
+<p class="p2"><span class="s2">// L.circleMarker draws a coloured circle (not an image icon).</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">function locateMe() {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>if (!navigator.geolocation) {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>alert('Location not supported in this browser.');</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>return;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>navigator.geolocation.getCurrentPosition(pos =&gt; {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>const { latitude: lat, longitude: lng } = pos.coords;</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>// Remove old user marker if it exists</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>if (userMarker) map.removeLayer(userMarker);</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>userMarker = L.circleMarker([lat, lng], {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">      </span>radius: 9,</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">      </span>fillColor: '#4A90D9',</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">      </span>fillOpacity: 1,</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">      </span>color: 'white',</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">      </span>weight: 2.5</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>}).addTo(map);</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>map.setView([lat, lng], 14);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>}, () =&gt; {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>alert('Could not get your location. Please allow location access.');</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>});</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">// ROUTE — GET WALKING ROUTE</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// Call the OSRM public routing API (free, no key needed).</span></p>
+<p class="p2"><span class="s2">// It returns a GeoJSON LineString of the walking path between</span></p>
+<p class="p2"><span class="s2">// your location and the selected shop.</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// L.geoJSON() draws that path as a dashed line on the map.</span></p>
+<p class="p2"><span class="s2">// Also calculate distance and walking time and show them</span></p>
+<p class="p2"><span class="s2">// in the route row inside the info panel.</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// Walking speed assumed: 5 km/h (standard estimate)</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">async function getRoute() {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>if (!activeShop) return;</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>if (!userMarker) {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>alert('Tap ⊙ first to find your location.');</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>return;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>const userLatLng = userMarker.getLatLng();</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>const url = `https://router.project-osrm.org/route/v1/foot/` +</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>`${userLatLng.lng},${userLatLng.lat};${activeShop.lng},${activeShop.lat}` +</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>`?overview=full&amp;geometries=geojson`;</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>try {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>const res = await fetch(url);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>const data = await res.json();</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>const route = data.routes[0];</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>// Distance comes back in metres — convert to km</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>const distKm = (route.distance / 1000).toFixed(1);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>// Duration comes back in seconds — convert to minutes</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>const mins = Math.round(route.duration / 60);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>const timeStr = mins &gt;= 60</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">      </span>? `${Math.floor(mins / 60)}h ${mins % 60}m`</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">      </span>: `${mins} min`;</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>document.getElementById('route-dist').textContent = distKm + ' km';</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>document.getElementById('route-time').textContent = timeStr;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>document.getElementById('route-row').classList.add('visible');</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>// Draw the route on the map</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>if (routeLine) map.removeLayer(routeLine);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>routeLine = L.geoJSON(route.geometry, {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">      </span>style: { color: '#4A90D9', weight: 3, opacity: 0.85, dashArray: '6, 5' }</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>}).addTo(map);</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>// Fit the map to show both your location and the shop</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>const coords = route.geometry.coordinates;</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>const bounds = L.latLngBounds(coords.map(c =&gt; [c[1], c[0]]));</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>map.fitBounds(bounds, { padding: [60, 60] });</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>} catch (e) {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>alert('Could not fetch route. Check your internet connection.');</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>}</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p3"><span class="s2"></span><br></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">// HIDE LOADING SCREEN</span></p>
+<p class="p2"><span class="s2">//</span></p>
+<p class="p2"><span class="s2">// Once data is loaded fade out the loading overlay.</span></p>
+<p class="p2"><span class="s2">// setTimeout with 0ms defers execution to after the current</span></p>
+<p class="p2"><span class="s2">// paint cycle so the map is visible before the</span></p>
+<p class="p2"><span class="s2">// overlay is removed — prevents a flash of unstyled content.</span></p>
+<p class="p2"><span class="s2">// ============================================================</span></p>
+<p class="p2"><span class="s2">function hideLoading() {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>setTimeout(() =&gt; {</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>const el = document.getElementById('loading');</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>el.style.opacity = '0';</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">    </span>setTimeout(() =&gt; el.style.display = 'none', 400);</span></p>
+<p class="p2"><span class="s2"><span class="Apple-converted-space">  </span>}, 300);</span></p>
+<p class="p2"><span class="s2">}</span></p>
+<p class="p1"><span class="s1">&lt;/script&gt;<br>
+&lt;/body&gt;<br>
+&lt;/html&gt;</span></p>
+</body>
+</html>
