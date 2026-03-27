@@ -626,7 +626,7 @@
       btn.textContent = 'Locating...';
       if (!navigator.geolocation) {
         alert('Location not supported in this browser.');
-        btn.textContent = '📍 Find my location';
+        btn.textContent = 'Find my location';
         return;
       }
       navigator.geolocation.getCurrentPosition(pos => {
@@ -640,11 +640,11 @@
           weight: 2.5
         }).addTo(map);
         map.setView([lat, lng], 14);
-        btn.textContent = '📍 Location found';
-        setTimeout(() => btn.textContent = '📍 Find my location', 3000);
+        btn.textContent = 'Location found';
+        setTimeout(() => btn.textContent = 'Find my location', 3000);
       }, () => {
         alert('Could not get your location. Please allow location access.');
-        btn.textContent = '📍 Find my location';
+        btn.textContent = 'Find my location';
       });
     }
 
