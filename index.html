@@ -233,7 +233,7 @@
     #panel-name { font-size: 18px; font-weight: 700; color: #1a4a3a; }
     #panel-location { font-size: 13px; color: #8B6340; margin-top: 2px; }
 
-    #panel-ratings { display: flex; gap: 10px; margin-top: 12px; }
+    #panel-ratings { display: flex; gap: 10px; }
 
     .rating-badge {
       display: flex;
@@ -291,15 +291,26 @@
 
     #route-note { display: none; font-size: 11px; color: #a0856a; margin-top: 6px; font-style: italic; }
 
-    #panel-top { display: flex; align-items: flex-start; gap: 12px; }
-#panel-top-text { flex: 1; min-width: 0; }
+    #panel-top {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+#panel-top-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 #panel-photo {
-  width: 72px;
-  height: 72px;
+  width: 38%;
+  min-height: 140px;
   border-radius: 10px;
   object-fit: cover;
-  flex-shrink: 0;
+  object-position: center;
   display: none;
+  flex-shrink: 0;
   border: 1px solid #e8d8c4;
   cursor: pointer;
 }
@@ -399,20 +410,20 @@
       <div id="panel-top-text">
         <div id="panel-name"></div>
         <div id="panel-location"></div>
+        <div id="panel-ratings">
+          <div class="rating-badge">
+            <span class="badge-label">Taste</span>
+            <span class="stars" id="taste-stars"></span>
+            <span class="rating-num" id="taste-num"></span>
+          </div>
+          <div class="rating-badge">
+            <span class="badge-label">Vibe</span>
+            <span class="stars" id="vibe-stars"></span>
+            <span class="rating-num" id="vibe-num"></span>
+          </div>
+        </div>
       </div>
       <img id="panel-photo" src="" alt="" onclick="openPhoto()" />
-    </div>
-    <div id="panel-ratings">
-      <div class="rating-badge">
-        <span class="badge-label">Taste</span>
-        <span class="stars" id="taste-stars"></span>
-        <span class="rating-num" id="taste-num"></span>
-      </div>
-      <div class="rating-badge">
-        <span class="badge-label">Vibe</span>
-        <span class="stars" id="vibe-stars"></span>
-        <span class="rating-num" id="vibe-num"></span>
-      </div>
     </div>
     <div id="route-row">
       <div class="route-box">
