@@ -291,6 +291,19 @@
 
     #route-note { display: none; font-size: 11px; color: #a0856a; margin-top: 6px; font-style: italic; }
 
+    #panel-top { display: flex; align-items: flex-start; gap: 12px; }
+#panel-top-text { flex: 1; min-width: 0; }
+#panel-photo {
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  display: none;
+  border: 1px solid #e8d8c4;
+  cursor: pointer;
+}
+
     /* ── Loading ──────────────────────────────────────────── */
     #loading {
       position: fixed;
@@ -382,8 +395,13 @@
 
   <div id="info-panel">
     <div class="panel-handle"></div>
-    <div id="panel-name"></div>
-    <div id="panel-location"></div>
+    <div id="panel-top">
+      <div id="panel-top-text">
+        <div id="panel-name"></div>
+        <div id="panel-location"></div>
+      </div>
+      <img id="panel-photo" src="" alt="" onclick="openPhoto()" />
+    </div>
     <div id="panel-ratings">
       <div class="rating-badge">
         <span class="badge-label">Taste</span>
@@ -518,6 +536,13 @@ document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none
       gmapsBtn.href = shop.gmaps || '#';
       gmapsBtn.style.display = shop.gmaps ? 'block' : 'none';
 
+      const photoEl = document.getElementById('panel-photo');
+      if (shop.photo) {
+        photoEl.src = shop.photo;
+        photoEl.style.display = 'block';
+      } else {
+        photoEl.style.display = 'none';
+      }
       document.getElementById('route-row').classList.remove('visible');
       document.getElementById('route-note').style.display = 'none';
       document.getElementById('info-panel').classList.add('open');
@@ -657,6 +682,10 @@ document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none
     // ============================================================
     // LOADING
     // ============================================================
+    function openPhoto() {
+      if (activeShop && activeShop.photo) window.open(activeShop.photo, '_blank');
+    }
+    
     function hideLoading() {
       setTimeout(() => {
         const el = document.getElementById('loading');
