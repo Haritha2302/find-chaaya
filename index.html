@@ -42,12 +42,12 @@
     }
 
     header p {
-      font-size: 11px;
-      color: #c9a84c;
-      margin-top: 1px;
-      font-style: italic;
-      font-weight: 700;
-    }
+  font-size: 11px;
+  color: #c9a84c;
+  margin-top: 1px;
+  font-style: italic;
+  font-weight: 700;
+}
 
     /* ── Header buttons ───────────────────────────────────── */
     .header-actions {
@@ -131,12 +131,12 @@
     }
 
     /* Pill buttons for star selection */
-    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-pills { display: flex; gap: 4px; }
 
-    .filter-pill {
-      font-size: 12px;
-      font-family: 'Georgia', serif;
-      padding: 4px 11px;
+.filter-pill {
+  font-size: 11px;
+  font-family: 'Georgia', serif;
+  padding: 3px 9px;
       border-radius: 20px;
       border: 1px solid #e8d8c4;
       background: none;
@@ -426,8 +426,8 @@
     // Display size is 63x80. iconAnchor at bottom-centre tip.
     // ============================================================
     function makeIcon(selected) {
-      const w = selected ? 76 : 60;
-      const h = selected ? 96 : 76;
+      const w = selected ? 52 : 40;
+const h = selected ? 66 : 51;
       return L.divIcon({
         className: '',
         html: `<img src="marker.png" width="${w}" height="${h}" style="object-fit:contain;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.35))${selected ? ' brightness(1.1)' : ''};" />`,
@@ -484,7 +484,17 @@
       document.getElementById('shop-count').textContent =
         n === 0 ? 'No shops match your filter' : n === 1 ? '1 shop found' : `${n} shops found`;
       countBar.classList.toggle('empty', n === 0);
-      document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none';
+document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none';
+
+      if (n > 0 && (tasteMin > 0 || vibeMin > 0)) {
+        const validShops = shops.filter(s => s.lat && s.lng);
+        if (validShops.length === 1) {
+          map.setView([validShops[0].lat, validShops[0].lng], 15);
+        } else {
+          const bounds = L.latLngBounds(validShops.map(s => [s.lat, s.lng]));
+          map.fitBounds(bounds, { padding: [60, 60], maxZoom: 15 });
+        }
+      }
     }
 
     // ============================================================
