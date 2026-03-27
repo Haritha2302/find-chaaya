@@ -13,22 +13,19 @@
 
     body {
       font-family: 'Georgia', serif;
-      background: #fdf8f2;
-      color: #2a1a0a;
+      background: #0f2d22;
+      color: #fdf8f2;
       height: 100dvh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    /* ── Header ─────────────────────────────────────────────
-       Now a flex row: title on the left, "Find my location"
-       button on the right. Much more discoverable than the
-       old floating circle icon.                             */
+    /* ── Header ───────────────────────────────────────────── */
     header {
       padding: 10px 16px;
-      background: #fdf8f2;
-      border-bottom: 1px solid #e8d8c4;
+      background: #1a4a3a;
+      border-bottom: 1px solid #2a6a50;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -41,142 +38,174 @@
       font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.3px;
-      color: #2a1a0a;
+      color: #c9a84c;
     }
 
     header p {
-      font-size: 12px;
-      color: #8B6340;
+      font-size: 11px;
+      color: #c9a84c;
       margin-top: 1px;
       font-style: italic;
+      font-weight: 700;
+      opacity: 0.85;
     }
 
-    /* ── Locate button ──────────────────────────────────────
-       Moved from a floating circle icon to a clearly labelled
-       pill button in the header. The pin emoji gives a quick
-       visual cue without needing a custom icon file.         */
-    #locate-btn {
-  background: #2a1a0a;
-  border: 1px solid #2a1a0a;
-  border-radius: 20px;
-  padding: 7px 14px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #fdf8f2;
-  cursor: pointer;
-  font-family: 'Georgia', serif;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
 
-#locate-btn:active { background: #C8874A; border-color: #C8874A; }
+    .header-btn {
+      background: #c9a84c;
+      border: none;
+      border-radius: 20px;
+      padding: 7px 13px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f2d22;
+      cursor: pointer;
+      font-family: 'Georgia', serif;
+      white-space: nowrap;
+    }
 
-    /* ── Filter bar ─────────────────────────────────────────
-       Star tap filters. Each row has a label, 5 tappable
-       stars, and an "Any" reset pill.
-       How it works: tapping star N sets the minimum rating
-       to N. Stars 1..N turn amber; N+1..5 stay grey.
-       Tapping "Any" resets the filter (min = 0).            */
-    #filter-bar {
+    .header-btn:active { opacity: 0.8; }
+
+    .header-btn.secondary {
+      background: #2a6a50;
+      color: #c9a84c;
+    }
+
+    /* ── Filter panel ─────────────────────────────────────────
+       Collapsed by default. Slides open when Filter is tapped.
+       Sliders go from 0 (Any) to 5 stars.                     */
+    #filter-panel {
+      background: #1a4a3a;
+      border-bottom: 1px solid #2a6a50;
+      flex-shrink: 0;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.25s ease, padding 0.25s ease;
+      padding: 0 16px;
+    }
+
+    #filter-panel.open {
+      max-height: 140px;
+      padding: 12px 16px;
+    }
+
+    .filter-row {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 8px 16px;
-      background: #fdf8f2;
-      border-bottom: 1px solid #e8d8c4;
-      flex-shrink: 0;
-      flex-wrap: wrap;
+      margin-bottom: 10px;
     }
 
-    .filter-group {
+    .filter-row:last-child { margin-bottom: 0; }
+
+    .filter-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #c9a84c;
+      width: 40px;
+      flex-shrink: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .filter-slider {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      border-radius: 2px;
+      background: #2a6a50;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .filter-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #c9a84c;
+      cursor: pointer;
+      border: 2px solid #0f2d22;
+    }
+
+    .filter-slider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #c9a84c;
+      cursor: pointer;
+      border: 2px solid #0f2d22;
+    }
+
+    .filter-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: #c9a84c;
+      width: 80px;
+      flex-shrink: 0;
+    }
+
+    #filter-reset {
+      font-size: 11px;
+      color: #c9a84c;
+      opacity: 0.7;
+      cursor: pointer;
+      text-decoration: underline;
+      background: none;
+      border: none;
+      font-family: 'Georgia', serif;
+      margin-top: 2px;
+      display: block;
+    }
+
+    /* ── Shop count bar ───────────────────────────────────────
+       Always visible. Turns warm amber-red when 0 results so
+       the user immediately knows the filter is too strict.    */
+    #count-bar {
+      background: #0f2d22;
+      padding: 5px 16px;
+      font-size: 12px;
+      color: #c9a84c;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       gap: 6px;
+      border-bottom: 1px solid #1a4a3a;
     }
 
-    .filter-group label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #8B6340;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      white-space: nowrap;
-    }
-
-    /* The 5 tappable stars per filter */
-    .filter-stars { display: flex; gap: 1px; }
-
-    .filter-star {
-      font-size: 20px;
-      cursor: pointer;
-      color: #ddd;
-      line-height: 1;
-      padding: 2px 1px;
-      user-select: none;
-      transition: color 0.1s;
-    }
-
-    .filter-star.active { color: #C8874A; }
-
-    /* "Any" pill resets that filter */
-    .filter-any {
-      font-size: 11px;
-      color: #8B6340;
-      background: none;
-      border: 1px solid #e8d8c4;
-      border-radius: 20px;
-      padding: 3px 9px;
-      cursor: pointer;
-      font-family: 'Georgia', serif;
-    }
-
-    .filter-any { background: #C8874A; color: white; border-color: #C8874A; }
-.filter-any.dimmed { background: none; color: #8B6340; border-color: #e8d8c4; }
-
-    #shop-count {
-      margin-left: auto;
-      font-size: 11px;
-      color: #a0856a;
-      white-space: nowrap;
-    }
+    #count-bar.empty { background: #3a1a0a; color: #e8a06a; }
+    #shop-count { font-weight: 700; }
+    #filter-active-label { opacity: 0.6; font-style: italic; }
 
     /* ── Map ──────────────────────────────────────────────── */
-    #map {
-      flex: 1;
-      width: 100%;
-      min-height: 0;
+    #map { width: 100%; height: 100%; }
+
+    .leaflet-marker-icon { background: none !important; border: none !important; }
+
+    /* ── Empty state ──────────────────────────────────────── */
+    #empty-state {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1a4a3a;
+      border: 1px solid #c9a84c;
+      border-radius: 12px;
+      padding: 16px 24px;
+      text-align: center;
+      z-index: 500;
+      pointer-events: none;
     }
 
-    /* ── Marker wrap ────────────────────────────────────────
-       The exported PNG has a black background. Rather than
-       trying to make black transparent (which would also
-       affect the dark parts of the glass illustration), we
-       wrap the image in a white pill shape. The pill gives
-       the marker a clean, map-friendly look with a subtle
-       shadow so it lifts off the map tiles.                 */
-    .chai-marker-wrap {
-  width: 42px;
-  height: 42px;
-  background: none;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
-}
-
-    .chai-marker-wrap img {
-  width: 26px;
-  height: 32px;
-  object-fit: contain;
-}
-
-    /* Selected state: warm outline + stronger shadow */
-    .chai-marker-wrap.selected {
-      background: #fff8f0;
-      border: 2px solid #C8874A;
-      box-shadow: 0 3px 12px rgba(200,135,74,0.4);
-    }
+    #empty-state p { font-size: 14px; color: #c9a84c; font-weight: 700; }
+    #empty-state span { font-size: 12px; color: #a0c4b0; display: block; margin-top: 4px; }
 
     /* ── Bottom info panel ────────────────────────────────── */
     #info-panel {
@@ -184,8 +213,8 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: #fdf8f2;
-      border-top: 1px solid #e8d8c4;
+      background: #1a4a3a;
+      border-top: 2px solid #c9a84c;
       border-radius: 16px 16px 0 0;
       padding: 16px 20px 28px;
       z-index: 1000;
@@ -200,34 +229,23 @@
     .panel-handle {
       width: 36px;
       height: 4px;
-      background: #d4c4b0;
+      background: #c9a84c;
+      opacity: 0.5;
       border-radius: 2px;
       margin: 0 auto 14px;
     }
 
-    #panel-name {
-      font-size: 18px;
-      font-weight: 700;
-      color: #2a1a0a;
-    }
+    #panel-name { font-size: 18px; font-weight: 700; color: #c9a84c; }
+    #panel-location { font-size: 13px; color: #a0c4b0; margin-top: 2px; }
 
-    #panel-location {
-      font-size: 13px;
-      color: #8B6340;
-      margin-top: 2px;
-    }
-
-    #panel-ratings {
-      display: flex;
-      gap: 10px;
-      margin-top: 12px;
-    }
+    #panel-ratings { display: flex; gap: 10px; margin-top: 12px; }
 
     .rating-badge {
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: #f5ede0;
+      background: #0f2d22;
+      border: 1px solid #2a6a50;
       border-radius: 10px;
       padding: 8px 16px;
       min-width: 80px;
@@ -235,30 +253,16 @@
 
     .rating-badge .badge-label {
       font-size: 10px;
-      color: #8B6340;
+      color: #a0c4b0;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       font-weight: 600;
     }
 
-    .rating-badge .stars {
-      font-size: 16px;
-      color: #C8874A;
-      margin-top: 3px;
-      letter-spacing: 1px;
-    }
+    .rating-badge .stars { font-size: 16px; margin-top: 3px; letter-spacing: 1px; }
+    .rating-badge .rating-num { font-size: 11px; color: #a0c4b0; margin-top: 1px; }
 
-    .rating-badge .rating-num {
-      font-size: 11px;
-      color: #a0856a;
-      margin-top: 1px;
-    }
-
-    #panel-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-    }
+    #panel-actions { display: flex; gap: 10px; margin-top: 14px; }
 
     .btn {
       flex: 1;
@@ -271,46 +275,34 @@
       text-align: center;
       text-decoration: none;
       display: inline-block;
+      font-family: 'Georgia', serif;
     }
 
-    .btn-primary { background: #C8874A; color: white; }
-    .btn-secondary { background: #f5ede0; color: #5a3e28; }
+    .btn-primary { background: #c9a84c; color: #0f2d22; }
+    .btn-secondary { background: #0f2d22; color: #c9a84c; border: 1px solid #2a6a50; }
 
-    #route-row {
-      display: none;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
+    #route-row { display: none; gap: 10px; margin-top: 10px; }
     #route-row.visible { display: flex; }
 
     .route-box {
       flex: 1;
-      background: #f0e8d8;
+      background: #0f2d22;
+      border: 1px solid #2a6a50;
       border-radius: 10px;
       padding: 8px 12px;
       text-align: center;
     }
 
-    .route-box .route-label {
-      font-size: 10px;
-      color: #8B6340;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .route-box .route-label { font-size: 10px; color: #a0c4b0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .route-box .route-val { font-size: 16px; font-weight: 700; color: #c9a84c; margin-top: 2px; }
 
-    .route-box .route-val {
-      font-size: 16px;
-      font-weight: 700;
-      color: #2a1a0a;
-      margin-top: 2px;
-    }
+    #route-note { display: none; font-size: 11px; color: #a0c4b0; margin-top: 6px; font-style: italic; }
 
-    /* ── Loading overlay ──────────────────────────────────── */
+    /* ── Loading ──────────────────────────────────────────── */
     #loading {
       position: fixed;
       inset: 0;
-      background: #fdf8f2;
+      background: #0f2d22;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -319,21 +311,20 @@
       transition: opacity 0.4s ease;
     }
 
-    #loading h2 { font-size: 24px; color: #2a1a0a; margin-bottom: 6px; }
-    #loading p { font-size: 13px; color: #8B6340; font-style: italic; }
+    #loading h2 { font-size: 24px; color: #c9a84c; margin-bottom: 6px; }
+    #loading p { font-size: 13px; color: #a0c4b0; font-style: italic; }
 
     #loading-spinner {
       width: 36px;
       height: 36px;
-      border: 3px solid #e8d8c4;
-      border-top-color: #C8874A;
+      border: 3px solid #2a6a50;
+      border-top-color: #c9a84c;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin-bottom: 16px;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .leaflet-control-attribution { font-size: 9px !important; }
   </style>
 </head>
@@ -346,49 +337,48 @@
     <p>by Le Chaaya</p>
   </div>
 
-  <!-- Header: title + locate button side by side -->
   <header>
     <div class="header-text">
       <h1>Find Chaaya</h1>
       <p>by Le Chaaya</p>
     </div>
-    <button id="locate-btn" onclick="locateMe()">Find my location</button>
+    <div class="header-actions">
+      <button class="header-btn secondary" onclick="toggleFilter()">Filter</button>
+      <button class="header-btn" id="locate-btn" onclick="locateMe()">Find my location</button>
+    </div>
   </header>
 
-  <!-- Filter bar: star-tap filters for taste and vibe -->
-  <div id="filter-bar">
-    <div class="filter-group">
-      <label>Taste</label>
-      <div class="filter-stars" id="taste-stars-filter">
-        <span class="filter-star" data-val="1">★</span>
-        <span class="filter-star" data-val="2">★</span>
-        <span class="filter-star" data-val="3">★</span>
-        <span class="filter-star" data-val="4">★</span>
-        <span class="filter-star" data-val="5">★</span>
-      </div>
-      <button class="filter-any" id="taste-any" onclick="resetFilter('taste')">Any</button>
+  <div id="filter-panel">
+    <div class="filter-row">
+      <span class="filter-label">Taste</span>
+      <input type="range" class="filter-slider" id="taste-filter" min="0" max="5" step="1" value="0" oninput="applyFilters()" />
+      <span class="filter-val" id="taste-val">Any</span>
     </div>
-    <div class="filter-group">
-      <label>Vibe</label>
-      <div class="filter-stars" id="vibe-stars-filter">
-        <span class="filter-star" data-val="1">★</span>
-        <span class="filter-star" data-val="2">★</span>
-        <span class="filter-star" data-val="3">★</span>
-        <span class="filter-star" data-val="4">★</span>
-        <span class="filter-star" data-val="5">★</span>
-      </div>
-      <button class="filter-any" id="vibe-any" onclick="resetFilter('vibe')">Any</button>
+    <div class="filter-row">
+      <span class="filter-label">Vibe</span>
+      <input type="range" class="filter-slider" id="vibe-filter" min="0" max="5" step="1" value="0" oninput="applyFilters()" />
+      <span class="filter-val" id="vibe-val">Any</span>
     </div>
-    <span id="shop-count"></span>
+    <button id="filter-reset" onclick="resetFilters()">Reset filters</button>
   </div>
 
-  <div id="map"></div>
+  <div id="count-bar">
+    <span id="shop-count">Loading...</span>
+    <span id="filter-active-label"></span>
+  </div>
 
-  <!-- Bottom sheet -->
+  <div style="position:relative; flex:1; min-height:0;">
+    <div id="map" style="width:100%; height:100%;"></div>
+    <div id="empty-state">
+      <p>No shops found</p>
+      <span>Try relaxing your filters</span>
+    </div>
+  </div>
+
   <div id="info-panel">
     <div class="panel-handle"></div>
-    <div id="panel-name">Shop Name</div>
-    <div id="panel-location">Area, City</div>
+    <div id="panel-name"></div>
+    <div id="panel-location"></div>
     <div id="panel-ratings">
       <div class="rating-badge">
         <span class="badge-label">Taste</span>
@@ -402,18 +392,16 @@
       </div>
     </div>
     <div id="route-row">
-  <div class="route-box">
-    <div class="route-label">Distance</div>
-    <div class="route-val" id="route-dist">—</div>
-  </div>
-  <div class="route-box">
-    <div class="route-label">Walking</div>
-    <div class="route-val" id="route-time">—</div>
-  </div>
-</div>
-<p id="route-note" style="display:none; font-size:11px; color:#a0856a; margin-top:6px; font-style:italic;">
-  Walking time is approximate. Actual time may vary.
-</p>
+      <div class="route-box">
+        <div class="route-label">Distance</div>
+        <div class="route-val" id="route-dist">—</div>
+      </div>
+      <div class="route-box">
+        <div class="route-label">Walking</div>
+        <div class="route-val" id="route-time">—</div>
+      </div>
+    </div>
+    <p id="route-note">Walking time is approximate. Actual time may vary.</p>
     <div id="panel-actions">
       <a id="gmaps-btn" href="#" target="_blank" class="btn btn-primary">Open in Maps</a>
       <button class="btn btn-secondary" onclick="getRoute()">Get route</button>
@@ -428,24 +416,17 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwo1VyT3C4QKiW1absjR5BdjTh7I4lW2q_tMii3IlSSh42cPotMNBl6z4DaBAu0gEIR/exec';
 
     // ============================================================
-    // MARKER SETUP
-    //
-    // Instead of using L.icon() with a plain PNG (which shows
-    // the black background from your export), we use L.divIcon().
-    // divIcon lets us supply raw HTML as the marker. We wrap the
-    // PNG in a styled <div class="chai-marker-wrap"> which gives
-    // it a white pill background, border, and shadow — so it
-    // looks clean on any map tile colour.
+    // MARKER — pin shape, anchor at bottom tip
     // ============================================================
     function makeIcon(selected) {
+      const w = selected ? 58 : 46;
+      const h = selected ? 89 : 71;
       return L.divIcon({
-        className: '',   // clear Leaflet's default white square background
-        html: `<div class="chai-marker-wrap ${selected ? 'selected' : ''}">
-                 <img src="marker.png" />
-               </div>`,
-        iconSize: [42, 42],
-        iconAnchor: [21, 42],   // anchor at bottom-centre of the pill
-        popupAnchor: [0, -46]
+        className: '',
+        html: `<img src="marker.png" style="width:${w}px;height:${h}px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4))${selected?' brightness(1.15)':''};" />`,
+        iconSize: [w, h],
+        iconAnchor: [w / 2, h],
+        popupAnchor: [0, -h]
       });
     }
 
@@ -453,39 +434,29 @@
     const chaiIconSelected = makeIcon(true);
 
     // ============================================================
-    // MAP SETUP
+    // MAP — CartoDB Positron: clean muted grey, far less noise
+    // than the default OSM tiles. Roads visible but not shouty.
     // ============================================================
     const map = L.map('map', { zoomControl: true }).setView([9.98, 76.3], 12);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
+      attribution: '© OpenStreetMap © CARTO'
     }).addTo(map);
 
     // ============================================================
     // STATE
     // ============================================================
-    let allShops = [];
-    let markers = [];
-    let selectedMarker = null;
-    let userMarker = null;
-    let routeLine = null;
-    let activeShop = null;
-    let tasteMin = 0;   // 0 = no filter (Any)
-    let vibeMin = 0;
+    let allShops = [], markers = [], selectedMarker = null;
+    let userMarker = null, routeLine = null, activeShop = null;
 
     // ============================================================
-    // FETCH SHOP DATA
+    // FETCH
     // ============================================================
     fetch(SCRIPT_URL)
       .then(r => r.json())
-      .then(data => {
-        allShops = data.shops;
-        renderMarkers(allShops);
-        hideLoading();
-      })
-      .catch(err => {
-        console.error('Failed to load shop data:', err);
+      .then(data => { allShops = data.shops; renderMarkers(allShops); hideLoading(); })
+      .catch(() => {
         document.querySelector('#loading p').textContent = 'Could not load shops. Check the script URL.';
       });
 
@@ -498,19 +469,21 @@
 
       shops.forEach(shop => {
         if (!shop.lat || !shop.lng) return;
-
         const marker = L.marker([shop.lat, shop.lng], { icon: chaiIcon }).addTo(map);
         marker.on('click', () => selectShop(shop, marker));
         markers.push(marker);
       });
 
       const n = shops.length;
+      const countBar = document.getElementById('count-bar');
       document.getElementById('shop-count').textContent =
-        n === 1 ? '1 shop' : n + ' shops';
+        n === 0 ? 'No shops match your filter' : n === 1 ? '1 shop found' : `${n} shops found`;
+      countBar.classList.toggle('empty', n === 0);
+      document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none';
     }
 
     // ============================================================
-    // SELECT A SHOP
+    // SELECT SHOP
     // ============================================================
     function selectShop(shop, marker) {
       if (selectedMarker) selectedMarker.setIcon(chaiIcon);
@@ -521,7 +494,6 @@
       document.getElementById('panel-name').textContent = shop.name;
       document.getElementById('panel-location').textContent =
         [shop.area, shop.city, shop.state].filter(Boolean).join(', ');
-
       document.getElementById('taste-stars').innerHTML = starsFor(shop.taste);
       document.getElementById('taste-num').textContent = shop.taste + ' / 5';
       document.getElementById('vibe-stars').innerHTML = starsFor(shop.vibe);
@@ -532,28 +504,24 @@
       gmapsBtn.style.display = shop.gmaps ? 'block' : 'none';
 
       document.getElementById('route-row').classList.remove('visible');
+      document.getElementById('route-note').style.display = 'none';
       document.getElementById('info-panel').classList.add('open');
       map.panTo([shop.lat, shop.lng]);
     }
 
     // ============================================================
     // HALF-STAR RENDERER
-    //
-    // Builds an HTML string of 5 stars where:
-    // - val >= i         → filled amber star
-    // - val >= i - 0.5   → half star (CSS gradient left=amber, right=grey)
-    // - otherwise        → empty grey star
     // ============================================================
     function starsFor(n) {
       const val = Number(n);
       let html = '';
       for (let i = 1; i <= 5; i++) {
         if (val >= i) {
-          html += '<span style="color:#C8874A">★</span>';
+          html += '<span style="color:#c9a84c">★</span>';
         } else if (val >= i - 0.5) {
-          html += '<span style="background:linear-gradient(to right,#C8874A 50%,#ddd 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">★</span>';
+          html += '<span style="background:linear-gradient(to right,#c9a84c 50%,#2a6a50 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">★</span>';
         } else {
-          html += '<span style="color:#ddd">★</span>';
+          html += '<span style="color:#2a6a50">★</span>';
         }
       }
       return html;
@@ -573,52 +541,42 @@
     map.on('click', closePanel);
 
     // ============================================================
-    // STAR TAP FILTERS
-    //
-    // Each star in the filter row has a data-val attribute (1–5).
-    // When tapped, we set tasteMin (or vibeMin) to that value,
-    // highlight stars 1..N in amber, then re-run applyFilters().
-    //
-    // setStarFilter(type, val) does the visual update.
-    // applyFilters() does the data filtering + re-render.
-    // resetFilter(type) sets min back to 0 and clears the stars.
+    // FILTER TOGGLE
     // ============================================================
-    function setStarFilter(type, val) {
-      const stars = document.querySelectorAll(`#${type}-stars-filter .filter-star`);
-      stars.forEach(s => {
-        s.classList.toggle('active', Number(s.dataset.val) <= val);
-      });
-      // Dim the "Any" button when a filter is active
-      document.getElementById(`${type}-any`).classList.toggle('dimmed', val > 0);
-
-      if (type === 'taste') tasteMin = val;
-      else vibeMin = val;
-
-      applyFilters();
+    function toggleFilter() {
+      document.getElementById('filter-panel').classList.toggle('open');
     }
 
-    function resetFilter(type) {
-      setStarFilter(type, 0);
-    }
-
+    // ============================================================
+    // FILTERS
+    // ============================================================
     function applyFilters() {
-      closePanel();
+      const tasteMin = Number(document.getElementById('taste-filter').value);
+      const vibeMin = Number(document.getElementById('vibe-filter').value);
+
+      document.getElementById('taste-val').textContent = tasteMin === 0 ? 'Any' : `≥ ${tasteMin} stars`;
+      document.getElementById('vibe-val').textContent = vibeMin === 0 ? 'Any' : `≥ ${vibeMin} stars`;
+
       const filtered = allShops.filter(s =>
         Number(s.taste) >= tasteMin && Number(s.vibe) >= vibeMin
       );
+
+      closePanel();
       renderMarkers(filtered);
+
+      const isFiltered = tasteMin > 0 || vibeMin > 0;
+      document.getElementById('filter-active-label').textContent =
+        isFiltered ? '· filters active' : '';
     }
 
-    // Wire up click handlers on all filter stars
-    document.querySelectorAll('.filter-star').forEach(star => {
-      star.addEventListener('click', () => {
-        const type = star.closest('.filter-group').querySelector('label').textContent.toLowerCase();
-        setStarFilter(type, Number(star.dataset.val));
-      });
-    });
+    function resetFilters() {
+      document.getElementById('taste-filter').value = 0;
+      document.getElementById('vibe-filter').value = 0;
+      applyFilters();
+    }
 
     // ============================================================
-    // GPS — FIND MY LOCATION
+    // LOCATE
     // ============================================================
     function locateMe() {
       const btn = document.getElementById('locate-btn');
@@ -632,11 +590,8 @@
         const { latitude: lat, longitude: lng } = pos.coords;
         if (userMarker) map.removeLayer(userMarker);
         userMarker = L.circleMarker([lat, lng], {
-          radius: 9,
-          fillColor: '#4A90D9',
-          fillOpacity: 1,
-          color: 'white',
-          weight: 2.5
+          radius: 9, fillColor: '#c9a84c', fillOpacity: 1,
+          color: '#0f2d22', weight: 2.5
         }).addTo(map);
         map.setView([lat, lng], 14);
         btn.textContent = 'Location found';
@@ -648,53 +603,43 @@
     }
 
     // ============================================================
-    // WALKING ROUTE
+    // ROUTE
     // ============================================================
     async function getRoute() {
-      if (!activeShop) return;
-      if (!userMarker) {
+      if (!activeShop || !userMarker) {
         alert('Tap "Find my location" first.');
         return;
       }
-
       const userLatLng = userMarker.getLatLng();
       const url = `https://router.project-osrm.org/route/v1/foot/` +
         `${userLatLng.lng},${userLatLng.lat};${activeShop.lng},${activeShop.lat}` +
         `?overview=full&geometries=geojson`;
-
       try {
         const res = await fetch(url);
         const data = await res.json();
         const route = data.routes[0];
-
         const distKm = (route.distance / 1000).toFixed(1);
         const mins = Math.max(1, Math.ceil((route.distance / 1000) / 4.8 * 60));
-const timeStr = mins >= 60
-  ? `~${Math.floor(mins / 60)}h ${mins % 60}m`
-  : `~${mins} min`;
+        const timeStr = mins >= 60 ? `~${Math.floor(mins/60)}h ${mins%60}m` : `~${mins} min`;
 
         document.getElementById('route-dist').textContent = distKm + ' km';
         document.getElementById('route-time').textContent = timeStr;
         document.getElementById('route-row').classList.add('visible');
-document.getElementById('route-note').style.display = 'block';
+        document.getElementById('route-note').style.display = 'block';
 
         if (routeLine) map.removeLayer(routeLine);
         routeLine = L.geoJSON(route.geometry, {
-          style: { color: '#4A90D9', weight: 3, opacity: 0.85, dashArray: '6, 5' }
+          style: { color: '#c9a84c', weight: 3, opacity: 0.9, dashArray: '6, 5' }
         }).addTo(map);
-
         const coords = route.geometry.coordinates;
-        map.fitBounds(
-          L.latLngBounds(coords.map(c => [c[1], c[0]])),
-          { padding: [60, 60] }
-        );
-      } catch (e) {
+        map.fitBounds(L.latLngBounds(coords.map(c => [c[1], c[0]])), { padding: [60, 60] });
+      } catch {
         alert('Could not fetch route. Check your internet connection.');
       }
     }
 
     // ============================================================
-    // HIDE LOADING SCREEN
+    // LOADING
     // ============================================================
     function hideLoading() {
       setTimeout(() => {
