@@ -5,40 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Find Chaaya</title>
 
-  <!--
-    Leaflet.js is the open-source map library we're using.
-    It handles all the map rendering, zoom, pan, and markers.
-    We load the CSS (styles) and JS (logic) from a CDN so
-    we don't have to bundle them ourselves.
-  -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
-    /* ── Reset & base ───────────────────────────────────────
-       We remove all default browser padding/margin and set
-       the page to fill the full screen. The map will take
-       up most of the viewport height.                       */
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Georgia', serif;
       background: #fdf8f2;
       color: #2a1a0a;
-      height: 100dvh;           /* dvh = dynamic viewport height, works on mobile */
+      height: 100dvh;
       display: flex;
-      flex-direction: column;   /* stack header → map → panel vertically */
+      flex-direction: column;
       overflow: hidden;
     }
 
     /* ── Header ─────────────────────────────────────────────
-       The top bar with the app name and tagline.            */
+       Now a flex row: title on the left, "Find my location"
+       button on the right. Much more discoverable than the
+       old floating circle icon.                             */
     header {
-      padding: 12px 20px 10px;
+      padding: 10px 16px;
       background: #fdf8f2;
       border-bottom: 1px solid #e8d8c4;
-      flex-shrink: 0;           /* don't let the header compress */
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
+
+    .header-text { flex: 1; }
 
     header h1 {
       font-size: 22px;
@@ -54,13 +51,36 @@
       font-style: italic;
     }
 
+    /* ── Locate button ──────────────────────────────────────
+       Moved from a floating circle icon to a clearly labelled
+       pill button in the header. The pin emoji gives a quick
+       visual cue without needing a custom icon file.         */
+    #locate-btn {
+      background: #f5ede0;
+      border: 1px solid #e8d8c4;
+      border-radius: 20px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #5a3e28;
+      cursor: pointer;
+      font-family: 'Georgia', serif;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    #locate-btn:active { background: #C8874A; color: white; }
+
     /* ── Filter bar ─────────────────────────────────────────
-       The row of controls for filtering by taste/vibe rating.
-       flex-shrink:0 ensures it never collapses.             */
+       Star tap filters. Each row has a label, 5 tappable
+       stars, and an "Any" reset pill.
+       How it works: tapping star N sets the minimum rating
+       to N. Stars 1..N turn amber; N+1..5 stay grey.
+       Tapping "Any" resets the filter (min = 0).            */
     #filter-bar {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       padding: 8px 16px;
       background: #fdf8f2;
       border-bottom: 1px solid #e8d8c4;
@@ -71,29 +91,46 @@
     .filter-group {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: #5a3e28;
+      gap: 6px;
     }
 
     .filter-group label {
-      white-space: nowrap;
+      font-size: 11px;
       font-weight: 600;
+      color: #8B6340;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
     }
 
-    /* The range slider — styled to match the warm colour palette */
-    .filter-group input[type=range] {
-      width: 80px;
-      accent-color: #C8874A;
+    /* The 5 tappable stars per filter */
+    .filter-stars { display: flex; gap: 1px; }
+
+    .filter-star {
+      font-size: 20px;
       cursor: pointer;
+      color: #ddd;
+      line-height: 1;
+      padding: 2px 1px;
+      user-select: none;
+      transition: color 0.1s;
     }
 
-    .filter-group span {
-      min-width: 28px;
-      font-size: 13px;
-      font-weight: 700;
-      color: #C8874A;
+    .filter-star.active { color: #C8874A; }
+
+    /* "Any" pill resets that filter */
+    .filter-any {
+      font-size: 11px;
+      color: #8B6340;
+      background: none;
+      border: 1px solid #e8d8c4;
+      border-radius: 20px;
+      padding: 3px 9px;
+      cursor: pointer;
+      font-family: 'Georgia', serif;
     }
+
+    .filter-any.dimmed { opacity: 0.4; }
 
     #shop-count {
       margin-left: auto;
@@ -102,18 +139,46 @@
       white-space: nowrap;
     }
 
-    /* ── Map ────────────────────────────────────────────────
-       flex:1 means the map takes all remaining vertical space
-       after the header and filter bar are placed.           */
+    /* ── Map ──────────────────────────────────────────────── */
     #map {
       flex: 1;
       width: 100%;
-      min-height: 0;            /* required for flex children to shrink */
+      min-height: 0;
     }
 
-    /* ── Bottom info panel ──────────────────────────────────
-       Slides up from the bottom when a shop marker is tapped.
-       Uses transform to animate in/out smoothly.            */
+    /* ── Marker wrap ────────────────────────────────────────
+       The exported PNG has a black background. Rather than
+       trying to make black transparent (which would also
+       affect the dark parts of the glass illustration), we
+       wrap the image in a white pill shape. The pill gives
+       the marker a clean, map-friendly look with a subtle
+       shadow so it lifts off the map tiles.                 */
+    .chai-marker-wrap {
+      width: 38px;
+      height: 46px;
+      background: white;
+      border-radius: 50% 50% 44% 44% / 55% 55% 45% 45%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid #ddd;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    }
+
+    .chai-marker-wrap img {
+      width: 26px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    /* Selected state: warm outline + stronger shadow */
+    .chai-marker-wrap.selected {
+      background: #fff8f0;
+      border: 2px solid #C8874A;
+      box-shadow: 0 3px 12px rgba(200,135,74,0.4);
+    }
+
+    /* ── Bottom info panel ────────────────────────────────── */
     #info-panel {
       position: fixed;
       bottom: 0;
@@ -124,18 +189,14 @@
       border-radius: 16px 16px 0 0;
       padding: 16px 20px 28px;
       z-index: 1000;
-      transform: translateY(100%);   /* hidden below screen by default */
+      transform: translateY(100%);
       transition: transform 0.28s ease;
       max-width: 600px;
       margin: 0 auto;
     }
 
-    /* When the panel has class "open", slide it up into view */
-    #info-panel.open {
-      transform: translateY(0);
-    }
+    #info-panel.open { transform: translateY(0); }
 
-    /* The small drag handle at the top of the panel */
     .panel-handle {
       width: 36px;
       height: 4px;
@@ -156,7 +217,6 @@
       margin-top: 2px;
     }
 
-    /* The row showing taste and vibe rating badges */
     #panel-ratings {
       display: flex;
       gap: 10px;
@@ -181,7 +241,6 @@
       font-weight: 600;
     }
 
-    /* Stars rendered as filled/empty unicode stars */
     .rating-badge .stars {
       font-size: 16px;
       color: #C8874A;
@@ -195,7 +254,6 @@
       margin-top: 1px;
     }
 
-    /* The action buttons at the bottom of the panel */
     #panel-actions {
       display: flex;
       gap: 10px;
@@ -215,77 +273,9 @@
       display: inline-block;
     }
 
-    .btn-primary {
-      background: #C8874A;
-      color: white;
-    }
+    .btn-primary { background: #C8874A; color: white; }
+    .btn-secondary { background: #f5ede0; color: #5a3e28; }
 
-    .btn-secondary {
-      background: #f5ede0;
-      color: #5a3e28;
-    }
-
-    /* ── Loading overlay ────────────────────────────────────
-       Shown while the app fetches shop data from the script.
-       Fades out once data loads.                            */
-    #loading {
-      position: fixed;
-      inset: 0;
-      background: #fdf8f2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      transition: opacity 0.4s ease;
-    }
-
-    #loading h2 {
-      font-size: 24px;
-      color: #2a1a0a;
-      margin-bottom: 6px;
-    }
-
-    #loading p {
-      font-size: 13px;
-      color: #8B6340;
-      font-style: italic;
-    }
-
-    #loading-spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid #e8d8c4;
-      border-top-color: #C8874A;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 16px;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── "Find me" button ───────────────────────────────────
-       Floating button that triggers GPS location.          */
-    #locate-btn {
-      position: fixed;
-      bottom: 24px;
-      right: 16px;
-      z-index: 999;
-      background: white;
-      border: 1px solid #e8d8c4;
-      border-radius: 50%;
-      width: 46px;
-      height: 46px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    }
-
-    /* ── Route info bar ─────────────────────────────────────
-       Shown inside the panel after a route is calculated.  */
     #route-row {
       display: none;
       gap: 10px;
@@ -316,50 +306,85 @@
       margin-top: 2px;
     }
 
-    /* Leaflet attribution — keep it but make it small */
-    .leaflet-control-attribution {
-      font-size: 9px !important;
+    /* ── Loading overlay ──────────────────────────────────── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: #fdf8f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.4s ease;
     }
+
+    #loading h2 { font-size: 24px; color: #2a1a0a; margin-bottom: 6px; }
+    #loading p { font-size: 13px; color: #8B6340; font-style: italic; }
+
+    #loading-spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #e8d8c4;
+      border-top-color: #C8874A;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .leaflet-control-attribution { font-size: 9px !important; }
   </style>
 </head>
 
 <body>
 
-  <!-- Loading screen shown until data is fetched -->
   <div id="loading">
     <div id="loading-spinner"></div>
     <h2>Find Chaaya</h2>
     <p>by Le Chaaya</p>
   </div>
 
-  <!-- Header -->
+  <!-- Header: title + locate button side by side -->
   <header>
-    <h1>Find Chaaya</h1>
-    <p>by Le Chaaya</p>
+    <div class="header-text">
+      <h1>Find Chaaya</h1>
+      <p>by Le Chaaya</p>
+    </div>
+    <button id="locate-btn" onclick="locateMe()">📍 Find my location</button>
   </header>
 
-  <!-- Filter controls -->
+  <!-- Filter bar: star-tap filters for taste and vibe -->
   <div id="filter-bar">
     <div class="filter-group">
-      <label>Taste ≥</label>
-      <input type="range" id="taste-filter" min="1" max="5" step="1" value="1" />
-      <span id="taste-val">1</span>
+      <label>Taste</label>
+      <div class="filter-stars" id="taste-stars-filter">
+        <span class="filter-star" data-val="1">★</span>
+        <span class="filter-star" data-val="2">★</span>
+        <span class="filter-star" data-val="3">★</span>
+        <span class="filter-star" data-val="4">★</span>
+        <span class="filter-star" data-val="5">★</span>
+      </div>
+      <button class="filter-any" id="taste-any" onclick="resetFilter('taste')">Any</button>
     </div>
     <div class="filter-group">
-      <label>Vibe ≥</label>
-      <input type="range" id="vibe-filter" min="1" max="5" step="1" value="1" />
-      <span id="vibe-val">1</span>
+      <label>Vibe</label>
+      <div class="filter-stars" id="vibe-stars-filter">
+        <span class="filter-star" data-val="1">★</span>
+        <span class="filter-star" data-val="2">★</span>
+        <span class="filter-star" data-val="3">★</span>
+        <span class="filter-star" data-val="4">★</span>
+        <span class="filter-star" data-val="5">★</span>
+      </div>
+      <button class="filter-any" id="vibe-any" onclick="resetFilter('vibe')">Any</button>
     </div>
     <span id="shop-count"></span>
   </div>
 
-  <!-- The map renders into this div -->
   <div id="map"></div>
 
-  <!-- Floating locate button -->
-  <div id="locate-btn" onclick="locateMe()" title="Find my location">⊙</div>
-
-  <!-- Bottom sheet panel for shop details -->
+  <!-- Bottom sheet -->
   <div id="info-panel">
     <div class="panel-handle"></div>
     <div id="panel-name">Shop Name</div>
@@ -395,47 +420,37 @@
 
   <script>
     // ============================================================
-    // CONFIGURATION — only line you need to change
-    // Paste your Apps Script Web App URL below:
+    // CONFIGURATION — paste your Apps Script Web App URL here
     // ============================================================
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwo1VyT3C4QKiW1absjR5BdjTh7I4lW2q_tMii3IlSSh42cPotMNBl6z4DaBAu0gEIR/exec';
+    const SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
 
     // ============================================================
-    // HOW THE MARKER IMAGE WORKS
+    // MARKER SETUP
     //
-    // We use your chai glass PNG as the map marker.
-    // Leaflet's L.icon() lets us define a custom image as a
-    // marker. iconSize sets the display size on the map.
-    // iconAnchor is the pixel point on the icon that corresponds
-    // to the exact map location — [width/2, height] means the
-    // tip at the bottom-centre of the image is the anchor point.
+    // Instead of using L.icon() with a plain PNG (which shows
+    // the black background from your export), we use L.divIcon().
+    // divIcon lets us supply raw HTML as the marker. We wrap the
+    // PNG in a styled <div class="chai-marker-wrap"> which gives
+    // it a white pill background, border, and shadow — so it
+    // looks clean on any map tile colour.
     // ============================================================
-    const chaiIcon = L.icon({
-      iconUrl: 'marker.png',
-      iconSize: [40, 48],
-      iconAnchor: [20, 48],
-      popupAnchor: [0, -48]
-    });
+    function makeIcon(selected) {
+      return L.divIcon({
+        className: '',   // clear Leaflet's default white square background
+        html: `<div class="chai-marker-wrap ${selected ? 'selected' : ''}">
+                 <img src="marker.png" />
+               </div>`,
+        iconSize: [38, 46],
+        iconAnchor: [19, 46],   // anchor at bottom-centre of the pill
+        popupAnchor: [0, -46]
+      });
+    }
 
-    // Same icon but slightly larger for the selected state
-    const chaiIconSelected = L.icon({
-      iconUrl: 'marker.png',
-      iconSize: [50, 60],
-      iconAnchor: [25, 60],
-      popupAnchor: [0, -60]
-    });
+    const chaiIcon = makeIcon(false);
+    const chaiIconSelected = makeIcon(true);
 
     // ============================================================
-    // MAP INITIALISATION
-    //
-    // L.map('map') creates a Leaflet map inside the <div id="map">
-    // setView([lat, lng], zoom) sets the starting position.
-    // Zoom 12 = city level, 6 = country level.
-    // We start centred on Kochi since all current shops are there.
-    //
-    // L.tileLayer() loads the map background tiles from
-    // OpenStreetMap — the actual street map imagery.
-    // {s} = subdomain, {z}/{x}/{y} = tile coordinates.
+    // MAP SETUP
     // ============================================================
     const map = L.map('map', { zoomControl: true }).setView([9.98, 76.3], 12);
 
@@ -445,25 +460,19 @@
     }).addTo(map);
 
     // ============================================================
-    // STATE VARIABLES
-    //
-    // These variables live in memory and track the current state
-    // of the app — which shops are loaded, what's selected, etc.
+    // STATE
     // ============================================================
-    let allShops = [];           // all shops fetched from the sheet
-    let markers = [];            // Leaflet marker objects on the map
-    let selectedMarker = null;   // currently selected marker
-    let userMarker = null;       // the blue dot showing your location
-    let routeLine = null;        // the dashed route line on the map
-    let activeShop = null;       // the shop currently shown in the panel
+    let allShops = [];
+    let markers = [];
+    let selectedMarker = null;
+    let userMarker = null;
+    let routeLine = null;
+    let activeShop = null;
+    let tasteMin = 0;   // 0 = no filter (Any)
+    let vibeMin = 0;
 
     // ============================================================
-    // FETCHING SHOP DATA
-    //
-    // fetch() is the browser's built-in function to make HTTP
-    // requests. We call your Apps Script URL, which returns JSON.
-    // .then(r => r.json()) parses the JSON text into a JS object.
-    // Once we have the data, we call renderMarkers() to plot them.
+    // FETCH SHOP DATA
     // ============================================================
     fetch(SCRIPT_URL)
       .then(r => r.json())
@@ -473,66 +482,39 @@
         hideLoading();
       })
       .catch(err => {
-        // If the fetch fails (wrong URL, network issue), show an
-        // error so the user knows something went wrong.
         console.error('Failed to load shop data:', err);
         document.querySelector('#loading p').textContent = 'Could not load shops. Check the script URL.';
       });
 
     // ============================================================
-    // RENDERING MARKERS
-    //
-    // This function takes an array of shops and places a chai
-    // glass marker on the map for each one.
-    //
-    // First we remove all existing markers (in case we're
-    // re-rendering after a filter change), then add fresh ones.
-    //
-    // marker.on('click', ...) attaches a click handler so tapping
-    // a glass opens the info panel for that shop.
+    // RENDER MARKERS
     // ============================================================
     function renderMarkers(shops) {
-      // Remove old markers from the map
       markers.forEach(m => map.removeLayer(m));
       markers = [];
 
       shops.forEach(shop => {
-        // Skip shops with missing coordinates
         if (!shop.lat || !shop.lng) return;
 
         const marker = L.marker([shop.lat, shop.lng], { icon: chaiIcon }).addTo(map);
-
-        marker.on('click', () => {
-          selectShop(shop, marker);
-        });
-
+        marker.on('click', () => selectShop(shop, marker));
         markers.push(marker);
       });
 
-      // Update the count label in the filter bar
+      const n = shops.length;
       document.getElementById('shop-count').textContent =
-        shops.length === 1 ? '1 shop' : shops.length + ' shops';
+        n === 1 ? '1 shop' : n + ' shops';
     }
 
     // ============================================================
-    // SELECTING A SHOP
-    //
-    // When you tap a marker, this function:
-    // 1. Resets the previously selected marker back to normal size
-    // 2. Makes the tapped marker larger (selected state)
-    // 3. Populates the info panel with that shop's details
-    // 4. Slides the panel up into view
+    // SELECT A SHOP
     // ============================================================
     function selectShop(shop, marker) {
-      // Reset previous selection
       if (selectedMarker) selectedMarker.setIcon(chaiIcon);
-
-      // Highlight new selection
       marker.setIcon(chaiIconSelected);
       selectedMarker = marker;
       activeShop = shop;
 
-      // Fill in the panel
       document.getElementById('panel-name').textContent = shop.name;
       document.getElementById('panel-location').textContent =
         [shop.area, shop.city, shop.state].filter(Boolean).join(', ');
@@ -542,49 +524,40 @@
       document.getElementById('vibe-stars').innerHTML = starsFor(shop.vibe);
       document.getElementById('vibe-num').textContent = shop.vibe + ' / 5';
 
-      // Set the Google Maps link
       const gmapsBtn = document.getElementById('gmaps-btn');
-      if (shop.gmaps) {
-        gmapsBtn.href = shop.gmaps;
-        gmapsBtn.style.display = 'block';
-      } else {
-        gmapsBtn.style.display = 'none';
-      }
+      gmapsBtn.href = shop.gmaps || '#';
+      gmapsBtn.style.display = shop.gmaps ? 'block' : 'none';
 
-      // Hide any previous route info
       document.getElementById('route-row').classList.remove('visible');
-
-      // Open the panel by adding the 'open' class (see CSS)
       document.getElementById('info-panel').classList.add('open');
-
-      // Pan the map to centre on the selected shop
       map.panTo([shop.lat, shop.lng]);
     }
 
     // ============================================================
-    // STAR RATINGS
+    // HALF-STAR RENDERER
     //
-    // Converts a number (e.g. 4) into filled/empty star characters
-    // e.g. starsFor(4) → "★★★★☆"
-    // Math.round handles half-values like 3.5 → 4
+    // Builds an HTML string of 5 stars where:
+    // - val >= i         → filled amber star
+    // - val >= i - 0.5   → half star (CSS gradient left=amber, right=grey)
+    // - otherwise        → empty grey star
     // ============================================================
     function starsFor(n) {
-  const val = Number(n);
-  let html = '';
-  for (let i = 1; i <= 5; i++) {
-    if (val >= i) {
-      html += '<span style="color:#C8874A">★</span>';
-    } else if (val >= i - 0.5) {
-      html += '<span style="background:linear-gradient(to right,#C8874A 50%,#ddd 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">★</span>';
-    } else {
-      html += '<span style="color:#ddd">★</span>';
+      const val = Number(n);
+      let html = '';
+      for (let i = 1; i <= 5; i++) {
+        if (val >= i) {
+          html += '<span style="color:#C8874A">★</span>';
+        } else if (val >= i - 0.5) {
+          html += '<span style="background:linear-gradient(to right,#C8874A 50%,#ddd 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">★</span>';
+        } else {
+          html += '<span style="color:#ddd">★</span>';
+        }
+      }
+      return html;
     }
-  }
-  return html;
-}
 
     // ============================================================
-    // CLOSING THE PANEL
+    // CLOSE PANEL
     // ============================================================
     function closePanel() {
       document.getElementById('info-panel').classList.remove('open');
@@ -594,61 +567,67 @@
       if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
     }
 
-    // Close panel when tapping the map background
     map.on('click', closePanel);
 
     // ============================================================
-    // FILTERING
+    // STAR TAP FILTERS
     //
-    // When either slider moves, we re-filter allShops to only
-    // those where taste >= tasteMin AND vibe >= vibeMin,
-    // then re-render the markers.
+    // Each star in the filter row has a data-val attribute (1–5).
+    // When tapped, we set tasteMin (or vibeMin) to that value,
+    // highlight stars 1..N in amber, then re-run applyFilters().
     //
-    // allShops never changes — it always holds the full list.
-    // We just pass a filtered subset to renderMarkers().
+    // setStarFilter(type, val) does the visual update.
+    // applyFilters() does the data filtering + re-render.
+    // resetFilter(type) sets min back to 0 and clears the stars.
     // ============================================================
-    const tasteSlider = document.getElementById('taste-filter');
-    const vibeSlider = document.getElementById('vibe-filter');
+    function setStarFilter(type, val) {
+      const stars = document.querySelectorAll(`#${type}-stars-filter .filter-star`);
+      stars.forEach(s => {
+        s.classList.toggle('active', Number(s.dataset.val) <= val);
+      });
+      // Dim the "Any" button when a filter is active
+      document.getElementById(`${type}-any`).classList.toggle('dimmed', val > 0);
 
-    tasteSlider.addEventListener('input', applyFilters);
-    vibeSlider.addEventListener('input', applyFilters);
+      if (type === 'taste') tasteMin = val;
+      else vibeMin = val;
+
+      applyFilters();
+    }
+
+    function resetFilter(type) {
+      setStarFilter(type, 0);
+    }
 
     function applyFilters() {
-      const tasteMin = Number(tasteSlider.value);
-      const vibeMin = Number(vibeSlider.value);
-
-      document.getElementById('taste-val').textContent = tasteMin;
-      document.getElementById('vibe-val').textContent = vibeMin;
-
+      closePanel();
       const filtered = allShops.filter(s =>
         Number(s.taste) >= tasteMin && Number(s.vibe) >= vibeMin
       );
-
-      closePanel();
       renderMarkers(filtered);
     }
 
+    // Wire up click handlers on all filter stars
+    document.querySelectorAll('.filter-star').forEach(star => {
+      star.addEventListener('click', () => {
+        const type = star.closest('.filter-group').querySelector('label').textContent.toLowerCase();
+        setStarFilter(type, Number(star.dataset.val));
+      });
+    });
+
     // ============================================================
-    // GPS — FIND ME
-    //
-    // navigator.geolocation is the browser API for GPS.
-    // getCurrentPosition() asks the user for permission and
-    // then returns their coordinates.
-    //
-    // We place a blue circle marker at their location.
-    // L.circleMarker draws a coloured circle (not an image icon).
+    // GPS — FIND MY LOCATION
     // ============================================================
     function locateMe() {
+      const btn = document.getElementById('locate-btn');
+      btn.textContent = 'Locating...';
       if (!navigator.geolocation) {
         alert('Location not supported in this browser.');
+        btn.textContent = '📍 Find my location';
         return;
       }
       navigator.geolocation.getCurrentPosition(pos => {
         const { latitude: lat, longitude: lng } = pos.coords;
-
-        // Remove old user marker if it exists
         if (userMarker) map.removeLayer(userMarker);
-
         userMarker = L.circleMarker([lat, lng], {
           radius: 9,
           fillColor: '#4A90D9',
@@ -656,31 +635,22 @@
           color: 'white',
           weight: 2.5
         }).addTo(map);
-
         map.setView([lat, lng], 14);
+        btn.textContent = '📍 Location found';
+        setTimeout(() => btn.textContent = '📍 Find my location', 3000);
       }, () => {
         alert('Could not get your location. Please allow location access.');
+        btn.textContent = '📍 Find my location';
       });
     }
 
     // ============================================================
-    // ROUTE — GET WALKING ROUTE
-    //
-    // We call the OSRM public routing API (free, no key needed).
-    // It returns a GeoJSON LineString of the walking path between
-    // your location and the selected shop.
-    //
-    // L.geoJSON() draws that path as a dashed line on the map.
-    // We also calculate distance and walking time and show them
-    // in the route row inside the info panel.
-    //
-    // Walking speed assumed: 5 km/h (standard estimate)
+    // WALKING ROUTE
     // ============================================================
     async function getRoute() {
       if (!activeShop) return;
-
       if (!userMarker) {
-        alert('Tap ⊙ first to find your location.');
+        alert('Tap "Find my location" first.');
         return;
       }
 
@@ -694,9 +664,7 @@
         const data = await res.json();
         const route = data.routes[0];
 
-        // Distance comes back in metres — convert to km
         const distKm = (route.distance / 1000).toFixed(1);
-        // Duration comes back in seconds — convert to minutes
         const mins = Math.round(route.duration / 60);
         const timeStr = mins >= 60
           ? `${Math.floor(mins / 60)}h ${mins % 60}m`
@@ -706,17 +674,16 @@
         document.getElementById('route-time').textContent = timeStr;
         document.getElementById('route-row').classList.add('visible');
 
-        // Draw the route on the map
         if (routeLine) map.removeLayer(routeLine);
         routeLine = L.geoJSON(route.geometry, {
           style: { color: '#4A90D9', weight: 3, opacity: 0.85, dashArray: '6, 5' }
         }).addTo(map);
 
-        // Fit the map to show both your location and the shop
         const coords = route.geometry.coordinates;
-        const bounds = L.latLngBounds(coords.map(c => [c[1], c[0]]));
-        map.fitBounds(bounds, { padding: [60, 60] });
-
+        map.fitBounds(
+          L.latLngBounds(coords.map(c => [c[1], c[0]])),
+          { padding: [60, 60] }
+        );
       } catch (e) {
         alert('Could not fetch route. Check your internet connection.');
       }
@@ -724,11 +691,6 @@
 
     // ============================================================
     // HIDE LOADING SCREEN
-    //
-    // Once data is loaded we fade out the loading overlay.
-    // setTimeout with 0ms defers execution to after the current
-    // paint cycle so the map is visible before we remove the
-    // overlay — prevents a flash of unstyled content.
     // ============================================================
     function hideLoading() {
       setTimeout(() => {
