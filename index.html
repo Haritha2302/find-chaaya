@@ -13,8 +13,8 @@
 
     body {
       font-family: 'Georgia', serif;
-      background: #0f2d22;
-      color: #fdf8f2;
+      background: #fdf8f2;
+      color: #2a1a0a;
       height: 100dvh;
       display: flex;
       flex-direction: column;
@@ -24,8 +24,8 @@
     /* ── Header ───────────────────────────────────────────── */
     header {
       padding: 10px 16px;
-      background: #1a4a3a;
-      border-bottom: 1px solid #2a6a50;
+      background: #fdf8f2;
+      border-bottom: 1px solid #e8d8c4;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -38,7 +38,7 @@
       font-size: 22px;
       font-weight: 700;
       letter-spacing: -0.3px;
-      color: #c9a84c;
+      color: #1a4a3a;
     }
 
     header p {
@@ -47,9 +47,9 @@
       margin-top: 1px;
       font-style: italic;
       font-weight: 700;
-      opacity: 0.85;
     }
 
+    /* ── Header buttons ───────────────────────────────────── */
     .header-actions {
       display: flex;
       gap: 8px;
@@ -57,32 +57,48 @@
       flex-shrink: 0;
     }
 
-    .header-btn {
-      background: #c9a84c;
-      border: none;
+    /* Filter toggle — outlined dark green */
+    .btn-filter {
+      background: none;
+      border: 1.5px solid #1a4a3a;
       border-radius: 20px;
-      padding: 7px 13px;
+      padding: 6px 13px;
       font-size: 12px;
       font-weight: 700;
-      color: #0f2d22;
+      color: #1a4a3a;
       cursor: pointer;
       font-family: 'Georgia', serif;
       white-space: nowrap;
     }
 
-    .header-btn:active { opacity: 0.8; }
-
-    .header-btn.secondary {
-      background: #2a6a50;
-      color: #c9a84c;
+    .btn-filter.active {
+      background: #1a4a3a;
+      color: #fdf8f2;
     }
 
+    /* Locate — solid dark, primary action */
+    .btn-locate {
+      background: #2a1a0a;
+      border: none;
+      border-radius: 20px;
+      padding: 7px 13px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fdf8f2;
+      cursor: pointer;
+      font-family: 'Georgia', serif;
+      white-space: nowrap;
+    }
+
+    .btn-locate:active { background: #1a4a3a; }
+
     /* ── Filter panel ─────────────────────────────────────────
-       Collapsed by default. Slides open when Filter is tapped.
-       Sliders go from 0 (Any) to 5 stars.                     */
+       Slides down from header. Uses pill buttons instead of
+       sliders — each pill is a minimum star value. Tapping
+       "Any" resets. Much clearer UX than a slider.           */
     #filter-panel {
-      background: #1a4a3a;
-      border-bottom: 1px solid #2a6a50;
+      background: #fdf8f2;
+      border-bottom: 1px solid #e8d8c4;
       flex-shrink: 0;
       overflow: hidden;
       max-height: 0;
@@ -91,101 +107,80 @@
     }
 
     #filter-panel.open {
-      max-height: 140px;
-      padding: 12px 16px;
+      max-height: 120px;
+      padding: 10px 16px;
     }
 
     .filter-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 10px;
+      gap: 8px;
+      margin-bottom: 8px;
     }
 
     .filter-row:last-child { margin-bottom: 0; }
 
     .filter-label {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      color: #c9a84c;
-      width: 40px;
+      color: #8B6340;
+      width: 36px;
       flex-shrink: 0;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.5px;
     }
 
-    .filter-slider {
-      flex: 1;
-      -webkit-appearance: none;
-      height: 4px;
-      border-radius: 2px;
-      background: #2a6a50;
-      outline: none;
-      cursor: pointer;
-    }
+    /* Pill buttons for star selection */
+    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
 
-    .filter-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #c9a84c;
-      cursor: pointer;
-      border: 2px solid #0f2d22;
-    }
-
-    .filter-slider::-moz-range-thumb {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #c9a84c;
-      cursor: pointer;
-      border: 2px solid #0f2d22;
-    }
-
-    .filter-val {
-      font-size: 13px;
-      font-weight: 700;
-      color: #c9a84c;
-      width: 80px;
-      flex-shrink: 0;
-    }
-
-    #filter-reset {
-      font-size: 11px;
-      color: #c9a84c;
-      opacity: 0.7;
-      cursor: pointer;
-      text-decoration: underline;
-      background: none;
-      border: none;
+    .filter-pill {
+      font-size: 12px;
       font-family: 'Georgia', serif;
-      margin-top: 2px;
-      display: block;
+      padding: 4px 11px;
+      border-radius: 20px;
+      border: 1px solid #e8d8c4;
+      background: none;
+      color: #5a3e28;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.12s;
     }
 
-    /* ── Shop count bar ───────────────────────────────────────
-       Always visible. Turns warm amber-red when 0 results so
-       the user immediately knows the filter is too strict.    */
+    .filter-pill.active {
+      background: #1a4a3a;
+      border-color: #1a4a3a;
+      color: #fdf8f2;
+    }
+
+    .filter-pill.any-pill.active {
+      background: #c9a84c;
+      border-color: #c9a84c;
+      color: #2a1a0a;
+    }
+
+    /* ── Count bar ────────────────────────────────────────── */
     #count-bar {
-      background: #0f2d22;
+      background: #f5ede0;
       padding: 5px 16px;
       font-size: 12px;
-      color: #c9a84c;
+      color: #8B6340;
       flex-shrink: 0;
       display: flex;
       align-items: center;
-      gap: 6px;
-      border-bottom: 1px solid #1a4a3a;
+      gap: 5px;
+      border-bottom: 1px solid #e8d8c4;
     }
 
-    #count-bar.empty { background: #3a1a0a; color: #e8a06a; }
+    #count-bar.empty {
+      background: #fdf0e8;
+      color: #c0522a;
+    }
+
     #shop-count { font-weight: 700; }
-    #filter-active-label { opacity: 0.6; font-style: italic; }
+    #filter-active-label { font-style: italic; opacity: 0.7; }
 
     /* ── Map ──────────────────────────────────────────────── */
     #map { width: 100%; height: 100%; }
-
     .leaflet-marker-icon { background: none !important; border: none !important; }
 
     /* ── Empty state ──────────────────────────────────────── */
@@ -195,17 +190,18 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #1a4a3a;
-      border: 1px solid #c9a84c;
+      background: #fdf8f2;
+      border: 1px solid #e8d8c4;
       border-radius: 12px;
       padding: 16px 24px;
       text-align: center;
       z-index: 500;
       pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     }
 
-    #empty-state p { font-size: 14px; color: #c9a84c; font-weight: 700; }
-    #empty-state span { font-size: 12px; color: #a0c4b0; display: block; margin-top: 4px; }
+    #empty-state p { font-size: 14px; color: #2a1a0a; font-weight: 700; }
+    #empty-state span { font-size: 12px; color: #8B6340; display: block; margin-top: 4px; }
 
     /* ── Bottom info panel ────────────────────────────────── */
     #info-panel {
@@ -213,8 +209,8 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: #1a4a3a;
-      border-top: 2px solid #c9a84c;
+      background: #fdf8f2;
+      border-top: 2px solid #1a4a3a;
       border-radius: 16px 16px 0 0;
       padding: 16px 20px 28px;
       z-index: 1000;
@@ -229,14 +225,13 @@
     .panel-handle {
       width: 36px;
       height: 4px;
-      background: #c9a84c;
-      opacity: 0.5;
+      background: #d4c4b0;
       border-radius: 2px;
       margin: 0 auto 14px;
     }
 
-    #panel-name { font-size: 18px; font-weight: 700; color: #c9a84c; }
-    #panel-location { font-size: 13px; color: #a0c4b0; margin-top: 2px; }
+    #panel-name { font-size: 18px; font-weight: 700; color: #1a4a3a; }
+    #panel-location { font-size: 13px; color: #8B6340; margin-top: 2px; }
 
     #panel-ratings { display: flex; gap: 10px; margin-top: 12px; }
 
@@ -244,8 +239,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: #0f2d22;
-      border: 1px solid #2a6a50;
+      background: #f5ede0;
       border-radius: 10px;
       padding: 8px 16px;
       min-width: 80px;
@@ -253,14 +247,14 @@
 
     .rating-badge .badge-label {
       font-size: 10px;
-      color: #a0c4b0;
+      color: #8B6340;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       font-weight: 600;
     }
 
     .rating-badge .stars { font-size: 16px; margin-top: 3px; letter-spacing: 1px; }
-    .rating-badge .rating-num { font-size: 11px; color: #a0c4b0; margin-top: 1px; }
+    .rating-badge .rating-num { font-size: 11px; color: #a0856a; margin-top: 1px; }
 
     #panel-actions { display: flex; gap: 10px; margin-top: 14px; }
 
@@ -278,31 +272,30 @@
       font-family: 'Georgia', serif;
     }
 
-    .btn-primary { background: #c9a84c; color: #0f2d22; }
-    .btn-secondary { background: #0f2d22; color: #c9a84c; border: 1px solid #2a6a50; }
+    .btn-primary { background: #1a4a3a; color: #fdf8f2; }
+    .btn-secondary { background: #f5ede0; color: #5a3e28; }
 
     #route-row { display: none; gap: 10px; margin-top: 10px; }
     #route-row.visible { display: flex; }
 
     .route-box {
       flex: 1;
-      background: #0f2d22;
-      border: 1px solid #2a6a50;
+      background: #f5ede0;
       border-radius: 10px;
       padding: 8px 12px;
       text-align: center;
     }
 
-    .route-box .route-label { font-size: 10px; color: #a0c4b0; text-transform: uppercase; letter-spacing: 0.5px; }
-    .route-box .route-val { font-size: 16px; font-weight: 700; color: #c9a84c; margin-top: 2px; }
+    .route-box .route-label { font-size: 10px; color: #8B6340; text-transform: uppercase; letter-spacing: 0.5px; }
+    .route-box .route-val { font-size: 16px; font-weight: 700; color: #2a1a0a; margin-top: 2px; }
 
-    #route-note { display: none; font-size: 11px; color: #a0c4b0; margin-top: 6px; font-style: italic; }
+    #route-note { display: none; font-size: 11px; color: #a0856a; margin-top: 6px; font-style: italic; }
 
     /* ── Loading ──────────────────────────────────────────── */
     #loading {
       position: fixed;
       inset: 0;
-      background: #0f2d22;
+      background: #fdf8f2;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -311,14 +304,14 @@
       transition: opacity 0.4s ease;
     }
 
-    #loading h2 { font-size: 24px; color: #c9a84c; margin-bottom: 6px; }
-    #loading p { font-size: 13px; color: #a0c4b0; font-style: italic; }
+    #loading h2 { font-size: 24px; color: #1a4a3a; margin-bottom: 6px; }
+    #loading p { font-size: 13px; color: #8B6340; font-style: italic; }
 
     #loading-spinner {
       width: 36px;
       height: 36px;
-      border: 3px solid #2a6a50;
-      border-top-color: #c9a84c;
+      border: 3px solid #e8d8c4;
+      border-top-color: #1a4a3a;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin-bottom: 16px;
@@ -343,23 +336,35 @@
       <p>by Le Chaaya</p>
     </div>
     <div class="header-actions">
-      <button class="header-btn secondary" onclick="toggleFilter()">Filter</button>
-      <button class="header-btn" id="locate-btn" onclick="locateMe()">Find my location</button>
+      <button class="btn-filter" id="filter-toggle-btn" onclick="toggleFilter()">Filter</button>
+      <button class="btn-locate" id="locate-btn" onclick="locateMe()">Find my location</button>
     </div>
   </header>
 
+  <!-- Filter panel: pill buttons, one row per rating type -->
   <div id="filter-panel">
     <div class="filter-row">
       <span class="filter-label">Taste</span>
-      <input type="range" class="filter-slider" id="taste-filter" min="0" max="5" step="1" value="0" oninput="applyFilters()" />
-      <span class="filter-val" id="taste-val">Any</span>
+      <div class="filter-pills" id="taste-pills">
+        <button class="filter-pill any-pill active" onclick="setPill('taste', 0)">Any</button>
+        <button class="filter-pill" onclick="setPill('taste', 1)">1★+</button>
+        <button class="filter-pill" onclick="setPill('taste', 2)">2★+</button>
+        <button class="filter-pill" onclick="setPill('taste', 3)">3★+</button>
+        <button class="filter-pill" onclick="setPill('taste', 4)">4★+</button>
+        <button class="filter-pill" onclick="setPill('taste', 5)">5★</button>
+      </div>
     </div>
     <div class="filter-row">
       <span class="filter-label">Vibe</span>
-      <input type="range" class="filter-slider" id="vibe-filter" min="0" max="5" step="1" value="0" oninput="applyFilters()" />
-      <span class="filter-val" id="vibe-val">Any</span>
+      <div class="filter-pills" id="vibe-pills">
+        <button class="filter-pill any-pill active" onclick="setPill('vibe', 0)">Any</button>
+        <button class="filter-pill" onclick="setPill('vibe', 1)">1★+</button>
+        <button class="filter-pill" onclick="setPill('vibe', 2)">2★+</button>
+        <button class="filter-pill" onclick="setPill('vibe', 3)">3★+</button>
+        <button class="filter-pill" onclick="setPill('vibe', 4)">4★+</button>
+        <button class="filter-pill" onclick="setPill('vibe', 5)">5★</button>
+      </div>
     </div>
-    <button id="filter-reset" onclick="resetFilters()">Reset filters</button>
   </div>
 
   <div id="count-bar">
@@ -411,19 +416,21 @@
 
   <script>
     // ============================================================
-    // CONFIGURATION — paste your Apps Script Web App URL here
+    // CONFIGURATION
     // ============================================================
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwo1VyT3C4QKiW1absjR5BdjTh7I4lW2q_tMii3IlSSh42cPotMNBl6z4DaBAu0gEIR/exec';
 
     // ============================================================
-    // MARKER — pin shape, anchor at bottom tip
+    // MARKER
+    // Image is saved at 2x (127x160) for Retina sharpness.
+    // Display size is 63x80. iconAnchor at bottom-centre tip.
     // ============================================================
     function makeIcon(selected) {
-      const w = selected ? 58 : 46;
-      const h = selected ? 89 : 71;
+      const w = selected ? 76 : 60;
+      const h = selected ? 96 : 76;
       return L.divIcon({
         className: '',
-        html: `<img src="marker.png" style="width:${w}px;height:${h}px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4))${selected?' brightness(1.15)':''};" />`,
+        html: `<img src="marker.png" width="${w}" height="${h}" style="object-fit:contain;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.35))${selected ? ' brightness(1.1)' : ''};" />`,
         iconSize: [w, h],
         iconAnchor: [w / 2, h],
         popupAnchor: [0, -h]
@@ -434,8 +441,7 @@
     const chaiIconSelected = makeIcon(true);
 
     // ============================================================
-    // MAP — CartoDB Positron: clean muted grey, far less noise
-    // than the default OSM tiles. Roads visible but not shouty.
+    // MAP — CartoDB Positron: muted, minimal, low visual noise
     // ============================================================
     const map = L.map('map', { zoomControl: true }).setView([9.98, 76.3], 12);
 
@@ -449,6 +455,7 @@
     // ============================================================
     let allShops = [], markers = [], selectedMarker = null;
     let userMarker = null, routeLine = null, activeShop = null;
+    let tasteMin = 0, vibeMin = 0;
 
     // ============================================================
     // FETCH
@@ -466,14 +473,12 @@
     function renderMarkers(shops) {
       markers.forEach(m => map.removeLayer(m));
       markers = [];
-
       shops.forEach(shop => {
         if (!shop.lat || !shop.lng) return;
         const marker = L.marker([shop.lat, shop.lng], { icon: chaiIcon }).addTo(map);
         marker.on('click', () => selectShop(shop, marker));
         markers.push(marker);
       });
-
       const n = shops.length;
       const countBar = document.getElementById('count-bar');
       document.getElementById('shop-count').textContent =
@@ -519,9 +524,9 @@
         if (val >= i) {
           html += '<span style="color:#c9a84c">★</span>';
         } else if (val >= i - 0.5) {
-          html += '<span style="background:linear-gradient(to right,#c9a84c 50%,#2a6a50 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">★</span>';
+          html += '<span style="background:linear-gradient(to right,#c9a84c 50%,#ddd 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">★</span>';
         } else {
-          html += '<span style="color:#2a6a50">★</span>';
+          html += '<span style="color:#ddd">★</span>';
         }
       }
       return html;
@@ -544,35 +549,38 @@
     // FILTER TOGGLE
     // ============================================================
     function toggleFilter() {
-      document.getElementById('filter-panel').classList.toggle('open');
+      const panel = document.getElementById('filter-panel');
+      const btn = document.getElementById('filter-toggle-btn');
+      panel.classList.toggle('open');
+      btn.classList.toggle('active', panel.classList.contains('open'));
     }
 
     // ============================================================
-    // FILTERS
+    // PILL FILTER
+    // setPill(type, val) highlights the tapped pill, clears the
+    // rest, updates the min value, and re-renders markers.
     // ============================================================
+    function setPill(type, val) {
+      const container = document.getElementById(`${type}-pills`);
+      container.querySelectorAll('.filter-pill').forEach((pill, i) => {
+        pill.classList.toggle('active', i === val);
+      });
+
+      if (type === 'taste') tasteMin = val;
+      else vibeMin = val;
+
+      applyFilters();
+    }
+
     function applyFilters() {
-      const tasteMin = Number(document.getElementById('taste-filter').value);
-      const vibeMin = Number(document.getElementById('vibe-filter').value);
-
-      document.getElementById('taste-val').textContent = tasteMin === 0 ? 'Any' : `≥ ${tasteMin} stars`;
-      document.getElementById('vibe-val').textContent = vibeMin === 0 ? 'Any' : `≥ ${vibeMin} stars`;
-
+      closePanel();
       const filtered = allShops.filter(s =>
         Number(s.taste) >= tasteMin && Number(s.vibe) >= vibeMin
       );
-
-      closePanel();
       renderMarkers(filtered);
-
       const isFiltered = tasteMin > 0 || vibeMin > 0;
       document.getElementById('filter-active-label').textContent =
         isFiltered ? '· filters active' : '';
-    }
-
-    function resetFilters() {
-      document.getElementById('taste-filter').value = 0;
-      document.getElementById('vibe-filter').value = 0;
-      applyFilters();
     }
 
     // ============================================================
@@ -590,8 +598,8 @@
         const { latitude: lat, longitude: lng } = pos.coords;
         if (userMarker) map.removeLayer(userMarker);
         userMarker = L.circleMarker([lat, lng], {
-          radius: 9, fillColor: '#c9a84c', fillOpacity: 1,
-          color: '#0f2d22', weight: 2.5
+          radius: 9, fillColor: '#1a4a3a', fillOpacity: 1,
+          color: 'white', weight: 2.5
         }).addTo(map);
         map.setView([lat, lng], 14);
         btn.textContent = 'Location found';
@@ -621,15 +629,13 @@
         const distKm = (route.distance / 1000).toFixed(1);
         const mins = Math.max(1, Math.ceil((route.distance / 1000) / 4.8 * 60));
         const timeStr = mins >= 60 ? `~${Math.floor(mins/60)}h ${mins%60}m` : `~${mins} min`;
-
         document.getElementById('route-dist').textContent = distKm + ' km';
         document.getElementById('route-time').textContent = timeStr;
         document.getElementById('route-row').classList.add('visible');
         document.getElementById('route-note').style.display = 'block';
-
         if (routeLine) map.removeLayer(routeLine);
         routeLine = L.geoJSON(route.geometry, {
-          style: { color: '#c9a84c', weight: 3, opacity: 0.9, dashArray: '6, 5' }
+          style: { color: '#1a4a3a', weight: 3, opacity: 0.85, dashArray: '6, 5' }
         }).addTo(map);
         const coords = route.geometry.coordinates;
         map.fitBounds(L.latLngBounds(coords.map(c => [c[1], c[0]])), { padding: [60, 60] });
