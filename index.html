@@ -56,20 +56,20 @@
        pill button in the header. The pin emoji gives a quick
        visual cue without needing a custom icon file.         */
     #locate-btn {
-      background: #f5ede0;
-      border: 1px solid #e8d8c4;
-      border-radius: 20px;
-      padding: 7px 14px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #5a3e28;
-      cursor: pointer;
-      font-family: 'Georgia', serif;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+  background: #2a1a0a;
+  border: 1px solid #2a1a0a;
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fdf8f2;
+  cursor: pointer;
+  font-family: 'Georgia', serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 
-    #locate-btn:active { background: #C8874A; color: white; }
+#locate-btn:active { background: #C8874A; border-color: #C8874A; }
 
     /* ── Filter bar ─────────────────────────────────────────
        Star tap filters. Each row has a label, 5 tappable
@@ -167,10 +167,11 @@
     }
 
     .chai-marker-wrap img {
-      width: 26px;
-      height: 32px;
-      object-fit: contain;
-    }
+  width: 26px;
+  height: 32px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
 
     /* Selected state: warm outline + stronger shadow */
     .chai-marker-wrap.selected {
@@ -353,7 +354,7 @@
       <h1>Find Chaaya</h1>
       <p>by Le Chaaya</p>
     </div>
-    <button id="locate-btn" onclick="locateMe()">📍 Find my location</button>
+    <button id="locate-btn" onclick="locateMe()">Find my location</button>
   </header>
 
   <!-- Filter bar: star-tap filters for taste and vibe -->
@@ -403,15 +404,18 @@
       </div>
     </div>
     <div id="route-row">
-      <div class="route-box">
-        <div class="route-label">Distance</div>
-        <div class="route-val" id="route-dist">—</div>
-      </div>
-      <div class="route-box">
-        <div class="route-label">Walking</div>
-        <div class="route-val" id="route-time">—</div>
-      </div>
-    </div>
+  <div class="route-box">
+    <div class="route-label">Distance</div>
+    <div class="route-val" id="route-dist">—</div>
+  </div>
+  <div class="route-box">
+    <div class="route-label">Walking</div>
+    <div class="route-val" id="route-time">—</div>
+  </div>
+</div>
+<p id="route-note" style="display:none; font-size:11px; color:#a0856a; margin-top:6px; font-style:italic;">
+  Walking time is approximate. Actual time may vary.
+</p>
     <div id="panel-actions">
       <a id="gmaps-btn" href="#" target="_blank" class="btn btn-primary">Open in Maps</a>
       <button class="btn btn-secondary" onclick="getRoute()">Get route</button>
@@ -666,14 +670,15 @@
         const route = data.routes[0];
 
         const distKm = (route.distance / 1000).toFixed(1);
-        const mins = Math.round(route.duration / 60);
-        const timeStr = mins >= 60
-          ? `${Math.floor(mins / 60)}h ${mins % 60}m`
-          : `${mins} min`;
+        const mins = Math.max(1, Math.ceil(route.duration / 60));
+const timeStr = mins >= 60
+  ? `~${Math.floor(mins / 60)}h ${mins % 60}m`
+  : `~${mins} min`;
 
         document.getElementById('route-dist').textContent = distKm + ' km';
         document.getElementById('route-time').textContent = timeStr;
         document.getElementById('route-row').classList.add('visible');
+document.getElementById('route-note').style.display = 'block';
 
         if (routeLine) map.removeLayer(routeLine);
         routeLine = L.geoJSON(route.geometry, {
