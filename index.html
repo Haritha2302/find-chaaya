@@ -670,7 +670,7 @@
         const route = data.routes[0];
 
         const distKm = (route.distance / 1000).toFixed(1);
-        const mins = Math.max(1, Math.ceil(route.duration / 60));
+        const mins = Math.max(1, Math.ceil((route.distance / 1000) / 4.8 * 60));
 const timeStr = mins >= 60
   ? `~${Math.floor(mins / 60)}h ${mins % 60}m`
   : `~${mins} min`;
