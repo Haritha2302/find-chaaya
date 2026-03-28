@@ -274,57 +274,6 @@
 
     .btn-primary { background: #1a4a3a; color: #fdf8f2; }
     .btn-secondary { background: #f5ede0; color: #5a3e28; }
-
-    #route-row { display: none; gap: 10px; margin-top: 10px; }
-    #route-row.visible { display: flex; }
-
-    .route-box {
-      flex: 1;
-      background: #f5ede0;
-      border-radius: 10px;
-      padding: 8px 12px;
-      text-align: center;
-    }
-
-    .route-box .route-label { font-size: 10px; color: #8B6340; text-transform: uppercase; letter-spacing: 0.5px; }
-    .route-box .route-val { font-size: 16px; font-weight: 700; color: #2a1a0a; margin-top: 2px; }
-
-    #route-note { display: none; font-size: 11px; color: #a0856a; margin-top: 6px; font-style: italic; }
-
-    #toast {
-  position: fixed;
-  bottom: -80px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1a4a3a;
-  color: #fdf8f2;
-  border-radius: 14px;
-  padding: 14px 18px;
-  width: 88%;
-  max-width: 420px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  z-index: 1500;
-  transition: bottom 0.3s ease;
-  font-family: 'Georgia', serif;
-}
-#toast.show { bottom: 32px; }
-#toast span { font-size: 13px; line-height: 1.4; }
-#toast button {
-  background: #c9a84c;
-  border: none;
-  border-radius: 20px;
-  padding: 7px 13px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #2a1a0a;
-  cursor: pointer;
-  white-space: nowrap;
-  font-family: 'Georgia', serif;
-  flex-shrink: 0;
-}
     
     #photo-modal {
   display: none;
@@ -490,11 +439,6 @@
       <span>Try relaxing your filters</span>
     </div>
   </div>
-
-  <div id="toast">
-    <span>Tap <em>Find my location</em> first to get a route.</span>
-    <button onclick="dismissToast(); locateMe();">Find me</button>
-  </div>
   
   <div id="photo-modal" onclick="closePhotoModal(event)">
     <div id="photo-modal-box" style="position:relative;">
@@ -528,20 +472,9 @@
       </div>
       <img id="panel-photo" src="" alt="" onclick="openPhoto()" />
     </div>
-    <div id="route-row">
-      <div class="route-box">
-        <div class="route-label">Distance</div>
-        <div class="route-val" id="route-dist">—</div>
-      </div>
-      <div class="route-box">
-        <div class="route-label">Walking</div>
-        <div class="route-val" id="route-time">—</div>
-      </div>
-    </div>
-    <p id="route-note">Walking time is approximate. Actual time may vary.</p>
+    
     <div id="panel-actions">
       <a id="gmaps-btn" href="#" target="_blank" class="btn btn-primary">Open in Maps</a>
-      <button class="btn btn-secondary" onclick="getRoute()">Get route</button>
       <button class="btn btn-secondary" onclick="closePanel()">Close</button>
     </div>
   </div>
@@ -586,7 +519,7 @@ const h = selected ? 66 : 51;
     // STATE
     // ============================================================
     let allShops = [], markers = [], selectedMarker = null;
-    let userMarker = null, routeLine = null, activeShop = null;
+    let userMarker = null, activeShop = null;
     let tasteMin = 0, vibeMin = 0;
 
     // ============================================================
@@ -689,7 +622,6 @@ document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none
       if (selectedMarker) selectedMarker.setIcon(chaiIcon);
       selectedMarker = null;
       activeShop = null;
-      if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
     }
 
     map.on('click', closePanel);
@@ -757,53 +689,6 @@ document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none
         alert('Could not get your location. Please allow location access.');
         btn.textContent = 'Find my location';
       });
-    }
-
-    // ============================================================
-    // ROUTE
-    // ============================================================
-    let toastTimer;
-
-    function showToast() {
-      const toast = document.getElementById('toast');
-      toast.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(dismissToast, 4000);
-    }
-
-    function dismissToast() {
-      document.getElementById('toast').classList.remove('show');
-    }
-
-    async function getRoute() {
-      if (!activeShop || !userMarker) {
-        showToast();
-        return;
-      }
-      const userLatLng = userMarker.getLatLng();
-      const url = `https://router.project-osrm.org/route/v1/foot/` +
-        `${userLatLng.lng},${userLatLng.lat};${activeShop.lng},${activeShop.lat}` +
-        `?overview=full&geometries=geojson`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        const route = data.routes[0];
-        const distKm = (route.distance / 1000).toFixed(1);
-        const mins = Math.max(1, Math.ceil((route.distance / 1000) / 4.8 * 60));
-        const timeStr = mins >= 60 ? `~${Math.floor(mins/60)}h ${mins%60}m` : `~${mins} min`;
-        document.getElementById('route-dist').textContent = distKm + ' km';
-        document.getElementById('route-time').textContent = timeStr;
-        document.getElementById('route-row').classList.add('visible');
-        document.getElementById('route-note').style.display = 'block';
-        if (routeLine) map.removeLayer(routeLine);
-        routeLine = L.geoJSON(route.geometry, {
-          style: { color: '#1a4a3a', weight: 3, opacity: 0.85, dashArray: '6, 5' }
-        }).addTo(map);
-        const coords = route.geometry.coordinates;
-        map.fitBounds(L.latLngBounds(coords.map(c => [c[1], c[0]])), { padding: [60, 60] });
-      } catch {
-        alert('Could not fetch route. Check your internet connection.');
-      }
     }
 
     // ============================================================
