@@ -590,8 +590,6 @@ document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none
       } else {
         photoEl.style.display = 'none';
       }
-      document.getElementById('route-row').classList.remove('visible');
-      document.getElementById('route-note').style.display = 'none';
       document.getElementById('info-panel').classList.add('open');
       map.panTo([shop.lat, shop.lng]);
     }
