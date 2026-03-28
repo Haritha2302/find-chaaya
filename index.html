@@ -291,6 +291,41 @@
 
     #route-note { display: none; font-size: 11px; color: #a0856a; margin-top: 6px; font-style: italic; }
 
+    #toast {
+  position: fixed;
+  bottom: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a4a3a;
+  color: #fdf8f2;
+  border-radius: 14px;
+  padding: 14px 18px;
+  width: 88%;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 1500;
+  transition: bottom 0.3s ease;
+  font-family: 'Georgia', serif;
+}
+#toast.show { bottom: 32px; }
+#toast span { font-size: 13px; line-height: 1.4; }
+#toast button {
+  background: #c9a84c;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 13px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2a1a0a;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'Georgia', serif;
+  flex-shrink: 0;
+}
+    
     #photo-modal {
   display: none;
   position: fixed;
@@ -456,6 +491,11 @@
     </div>
   </div>
 
+  <div id="toast">
+    <span>Tap <em>Find my location</em> first to get a route.</span>
+    <button onclick="dismissToast(); locateMe();">Find me</button>
+  </div>
+  
   <div id="photo-modal" onclick="closePhotoModal(event)">
     <div id="photo-modal-box" style="position:relative;">
       <img id="photo-modal-img" src="" alt="" />
@@ -722,9 +762,22 @@ document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none
     // ============================================================
     // ROUTE
     // ============================================================
+    let toastTimer;
+
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(dismissToast, 4000);
+    }
+
+    function dismissToast() {
+      document.getElementById('toast').classList.remove('show');
+    }
+
     async function getRoute() {
       if (!activeShop || !userMarker) {
-        alert('Tap "Find my location" first.');
+        showToast();
         return;
       }
       const userLatLng = userMarker.getLatLng();
