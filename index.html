@@ -686,8 +686,8 @@ document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none
         const { latitude: lat, longitude: lng } = pos.coords;
         if (userMarker) map.removeLayer(userMarker);
         userMarker = L.circleMarker([lat, lng], {
-          radius: 9, fillColor: '#1a4a3a', fillOpacity: 1,
-          color: 'white', weight: 2.5
+          radius: 10, fillColor: '#4A90D9', fillOpacity: 1,
+          color: 'white', weight: 3
         }).addTo(map);
         map.setView([lat, lng], 14);
         btn.textContent = 'Location found';
