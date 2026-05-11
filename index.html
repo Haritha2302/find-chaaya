@@ -171,6 +171,22 @@
       border-bottom: 1px solid #e8d8c4;
     }
 
+    #btn-reset {
+      display: none;
+      margin-left: auto;
+      background: none;
+      border: 1px solid #1a4a3a;
+      border-radius: 12px;
+      padding: 2px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #1a4a3a;
+      cursor: pointer;
+      font-family: 'Georgia', serif;
+    }
+
+    #btn-reset:active { background: #1a4a3a; color: #fdf8f2; }
+
     #count-bar.empty {
       background: #fdf0e8;
       color: #c0522a;
@@ -449,8 +465,6 @@
       <span class="filter-label">Tags</span>
       <div class="filter-pills" id="tag-pills">
         <button class="filter-pill any-pill active" onclick="setTag('')">Any</button>
-        <button class="filter-pill" onclick="setTag('TOP_PICKS')">Top Picks</button>
-        <button class="filter-pill" onclick="setTag('Five Star Rated')">5★</button>
         <button class="filter-pill" onclick="setTag('Hidden Gem')">Hidden Gem</button>
         <button class="filter-pill" onclick="setTag('Waterfront')">Waterfront</button>
       </div>
@@ -461,6 +475,7 @@
   <div id="count-bar">
     <span id="shop-count">Loading...</span>
     <span id="filter-active-label"></span>
+    <button id="btn-reset" onclick="resetFilters()">Reset</button>
   </div>
 
   <div style="position:relative; flex:1; min-height:0;">
@@ -566,7 +581,8 @@
     // ============================================================
     let allShops = [], markers = [], selectedMarker = null;
     let userMarker = null, activeShop = null;
-    let tasteMin = 0, vibeMin = 0, tagFilter = '';
+    let tasteMin = 0, vibeMin = 0;
+    let activeTags = new Set();
 
     // ============================================================
     // FETCH
@@ -710,12 +726,32 @@ document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none
     }
 
     function setTag(tag) {
-      tagFilter = tag;
       const container = document.getElementById('tag-pills');
+
+      if (tag === '') {
+        // "Any" pressed — clear all tag filters
+        activeTags.clear();
+      } else {
+        // Toggle the tag in the active set
+        if (activeTags.has(tag)) activeTags.delete(tag);
+        else activeTags.add(tag);
+      }
+
+      // Update pill visual state
       container.querySelectorAll('.filter-pill').forEach(pill => {
         const onclick = pill.getAttribute('onclick') || '';
-        pill.classList.toggle('active', onclick.indexOf(`'${tag}'`) !== -1);
+        const match = onclick.match(/setTag\('([^']*)'\)/);
+        if (!match) return;
+        const pillTag = match[1];
+
+        if (pillTag === '') {
+          // "Any" is active only when nothing else is
+          pill.classList.toggle('active', activeTags.size === 0);
+        } else {
+          pill.classList.toggle('active', activeTags.has(pillTag));
+        }
       });
+
       applyFilters();
     }
 
@@ -724,16 +760,41 @@ document.getElementById('empty-state').style.display = n === 0 ? 'block' : 'none
       const filtered = allShops.filter(s => {
         if (Number(s.taste) < tasteMin) return false;
         if (Number(s.vibe) < vibeMin) return false;
-        if (tagFilter === 'TOP_PICKS') {
-          return Number(s.taste) >= 4 && Number(s.vibe) >= 4;
+        // AND across tags — shop must have every active tag
+        if (activeTags.size > 0) {
+          if (!s.tags) return false;
+          for (const t of activeTags) {
+            if (s.tags.indexOf(t) === -1) return false;
+          }
         }
-        if (tagFilter && (!s.tags || s.tags.indexOf(tagFilter) === -1)) return false;
         return true;
       });
       renderMarkers(filtered);
-      const isFiltered = tasteMin > 0 || vibeMin > 0 || tagFilter !== '';
+      const isFiltered = tasteMin > 0 || vibeMin > 0 || activeTags.size > 0;
       document.getElementById('filter-active-label').textContent =
         isFiltered ? '· filters active' : '';
+      document.getElementById('btn-reset').style.display = isFiltered ? 'inline-block' : 'none';
+    }
+
+    function resetFilters() {
+      tasteMin = 0;
+      vibeMin = 0;
+      activeTags.clear();
+
+      // Reset taste pills: "Any" active, others off
+      document.querySelectorAll('#taste-pills .filter-pill').forEach((pill, i) => {
+        pill.classList.toggle('active', i === 0);
+      });
+      // Reset vibe pills
+      document.querySelectorAll('#vibe-pills .filter-pill').forEach((pill, i) => {
+        pill.classList.toggle('active', i === 0);
+      });
+      // Reset tag pills: "Any" active, others off
+      document.querySelectorAll('#tag-pills .filter-pill').forEach((pill, i) => {
+        pill.classList.toggle('active', i === 0);
+      });
+
+      applyFilters();
     }
 
     // ============================================================
