@@ -60,10 +60,10 @@
     /* Filter toggle — outlined dark green */
     .btn-filter {
       background: none;
-      border: 1.5px solid #1a4a3a;
-      border-radius: 20px;
-      padding: 6px 13px;
-      font-size: 12px;
+      border: 1px solid #1a4a3a;
+      border-radius: 12px;
+      padding: 2px 10px;
+      font-size: 11px;
       font-weight: 700;
       color: #1a4a3a;
       cursor: pointer;
@@ -452,7 +452,6 @@
       <p>by Le Chaaya</p>
     </div>
     <div class="header-actions">
-      <button class="btn-filter" id="filter-toggle-btn" onclick="toggleFilter()">Filter</button>
       <button class="btn-locate" id="locate-btn" onclick="locateMe()">Find my location</button>
     </div>
   </header>
@@ -493,6 +492,7 @@
   </div>
 
   <div id="count-bar">
+    <button class="btn-filter" id="filter-toggle-btn" onclick="toggleFilter()">Filter</button>
     <span id="shop-count">Loading...</span>
     <span id="filter-active-label"></span>
     <button id="btn-reset" onclick="resetFilters()">Reset</button>
@@ -562,11 +562,11 @@
       const h = selected ? 66 : 51;
       const showLabel = label && map && map.getZoom && map.getZoom() >= 14;
       const labelHtml = showLabel
-        ? `<div style="position:absolute;top:${h + 2}px;left:50%;transform:translateX(-50%);background:rgba(253,248,242,0.85);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);color:#1a4a3a;font-family:Georgia,serif;font-size:11px;font-weight:700;line-height:1.25;padding:3px 9px;border-radius:14px;max-width:160px;text-align:center;white-space:normal;word-break:break-word;border:1px solid #D4AF37;box-shadow:0 1px 4px rgba(0,0,0,0.12);">${label}</div>`
+        ? `<div style="position:absolute;top:${h + 2}px;left:50%;transform:translateX(-50%);width:max-content;max-width:160px;background:rgba(253,248,242,0.85);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);color:#1a4a3a;font-family:Georgia,serif;font-size:11px;font-weight:700;line-height:1.25;padding:3px 9px;border-radius:14px;text-align:center;white-space:normal;overflow-wrap:break-word;border:1px solid #D4AF37;box-shadow:0 1px 4px rgba(0,0,0,0.12);">${label}</div>`
         : '';
       return L.divIcon({
         className: '',
-        html: `<div style="position:relative;width:${w}px;height:${h}px;"><img src="marker.png" width="${w}" height="${h}" style="object-fit:contain;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.35))${selected ? ' brightness(1.1)' : ''};" />${labelHtml}</div>`,
+        html: `<div style="position:relative;width:${w}px;height:${h}px;overflow:visible;"><img src="marker.png" width="${w}" height="${h}" style="object-fit:contain;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.35))${selected ? ' brightness(1.1)' : ''};" />${labelHtml}</div>`,
         iconSize: [w, h],
         iconAnchor: [w / 2, h],
         popupAnchor: [0, -h]
